@@ -11,7 +11,7 @@
 
 **Reflejos del lago** is a Geoguessr game of the province of Llanquihue. Try to guess where you are, looking just a photo. Is it Puerto Varas?, Puerto Montt? or maybe Llanquihue? Try your best to make the best score you can!
 
-Play the game: https://sharedussrepo.github.io/Reflejos-del-lago/#/
+Play the game [here!](https://alanuss.github.io/Reflejos-del-lago/#/)
 
 ## Install
 
