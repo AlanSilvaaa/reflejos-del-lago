@@ -4,7 +4,7 @@ import router from './router.js'
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import 'primeicons/primeicons.css'
-import './styles/output.css'
+import './styles/input.css'
 
 const app = createApp(App)
 app.use(router)
