@@ -9,3 +9,4 @@ This app is based on the popular game Geoguessr, where players are placed in a r
 - This project uses Vue3 with composition API, alongside with the Google Maps JavaScript API to fetch and display Street View images.
 - For visuals, it uses Tailwind CSS and Primevue for UI components. Always prefer to use this Primevue components when possible, like buttons, inputs, modals, etc. to maintain a consistent design across the app.
 - The database is located on a single file called reflejos.sqlite3, and it uses sqlite3 to query the data.
+- It uses `pnpm` as the package manager. Ensure to always use `pnpm` commands for installing dependencies and running scripts.
