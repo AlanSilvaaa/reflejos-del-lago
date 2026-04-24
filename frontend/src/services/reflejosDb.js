@@ -1,58 +1,80 @@
-import initSqlJs from 'sql.js'
+import initSqlJs from "sql.js";
 
-let nodesPromise
+let dbPromise;
+const SQLITE_DB_VERSION = "2026-04-24-schema-rename";
 
 async function loadDatabase() {
   const SQL = await initSqlJs({
     locateFile: () => `${import.meta.env.BASE_URL}sql-wasm.wasm`,
-  })
+  });
 
-  const response = await fetch(`${import.meta.env.BASE_URL}reflejos.sqlite3`)
+  const response = await fetch(
+    `${import.meta.env.BASE_URL}reflejos.sqlite3?v=${SQLITE_DB_VERSION}`,
+  );
 
   if (!response.ok) {
-    throw new Error(`No se pudo cargar reflejos.sqlite3: ${response.status}`)
+    throw new Error(`No se pudo cargar reflejos.sqlite3: ${response.status}`);
   }
 
-  const buffer = await response.arrayBuffer()
-  return new SQL.Database(new Uint8Array(buffer))
+  const buffer = await response.arrayBuffer();
+  return new SQL.Database(new Uint8Array(buffer));
 }
 
-async function loadNodes() {
-  const db = await loadDatabase()
-  const result = db.exec(`
-    SELECT city.name, geogessr_node.latitude, geogessr_node.longitude
-    FROM geogessr_node
-    INNER JOIN city ON city.id = geogessr_node.city_id
-  `)
-
-  if (!result.length) {
-    return []
+async function getDatabase() {
+  if (!dbPromise) {
+    dbPromise = loadDatabase();
   }
 
-  return result[0].values.map(([city, lat, lng]) => ({
-    city,
-    lat,
-    lng,
-  }))
+  return dbPromise;
 }
 
-export async function getAllNodes() {
-  if (!nodesPromise) {
-    nodesPromise = loadNodes()
-  }
+/**
+ * Reads one random node from the in-memory SQLite DB, excluding ids already used in the current game.
+ */
+function readRandomNode(db, usedNodeIds = []) {
+  const validUsedNodeIds = usedNodeIds.filter((id) => Number.isInteger(id));
+  const placeholders = validUsedNodeIds.map(() => "?").join(", ");
+  const whereClause = validUsedNodeIds.length
+    ? `WHERE geoguessr_node.id NOT IN (${placeholders})`
+    : "";
+  const statement = db.prepare(`
+    SELECT geoguessr_node.id, municipality.name, geoguessr_node.latitude, geoguessr_node.longitude
+    FROM geoguessr_node
+    INNER JOIN municipality ON municipality.id = geoguessr_node.municipality_id
+    ${whereClause}
+    ORDER BY RANDOM()
+    LIMIT 1
+  `);
 
-  return nodesPromise
+  try {
+    if (validUsedNodeIds.length) {
+      statement.bind(validUsedNodeIds);
+    }
+
+    if (!statement.step()) {
+      return null;
+    }
+
+    const row = statement.getAsObject();
+
+    return {
+      id: row.id,
+      municipality: row.name,
+      lat: row.latitude,
+      lng: row.longitude,
+    };
+  } finally {
+    statement.free();
+  }
 }
 
-export async function getRandomNode(usedCoords = []) {
-  const allNodes = await getAllNodes()
-  const usedSet = new Set(usedCoords.map(({ lat, lng }) => `${lat},${lng}`))
-  const availableNodes = allNodes.filter(({ lat, lng }) => !usedSet.has(`${lat},${lng}`))
-  const source = availableNodes.length ? availableNodes : allNodes
+export async function getRandomNode(usedNodeIds = []) {
+  const db = await getDatabase();
+  const node = readRandomNode(db, usedNodeIds) || readRandomNode(db);
 
-  if (!source.length) {
-    throw new Error('No hay nodos disponibles en la base de datos local')
+  if (!node) {
+    throw new Error("No hay nodos disponibles en la base de datos local");
   }
 
-  return source[Math.floor(Math.random() * source.length)]
+  return node;
 }

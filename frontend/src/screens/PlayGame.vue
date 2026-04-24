@@ -11,7 +11,7 @@ const route = useRoute();
 
 const round = ref(parseInt(route.query.round) || 1);
 const gamemode = ref(route.query.gamemode || "Normal");
-const usedCoords = ref([]);
+const usedNodeIds = ref([]);
 const initialCoord = ref(null);
 const reloadCounter = ref(0);
 const timeExpired = ref(false)
@@ -25,9 +25,9 @@ const timeoutId = ref(null)
 
 if (route.query.used) {
     try {
-        usedCoords.value = JSON.parse(route.query.used);
+        usedNodeIds.value = JSON.parse(route.query.used);
     } catch (e) {
-        console.error("Error al parsear coordenadas usadas:", e);
+        console.error("Error al parsear ids usados:", e);
     }
 }
 
@@ -35,13 +35,13 @@ const realCoord = ref({ lat: 0, lng: 0 });
 
 async function fetchRandomCoord() {
     try {
-        const coord = await getRandomNode(usedCoords.value);
+        const coord = await getRandomNode(usedNodeIds.value);
 
         realCoord.value = coord;
         if (!initialCoord.value) {
             initialCoord.value = { ...coord };
         }
-        usedCoords.value.push({ lat: coord.lat, lng: coord.lng });
+        usedNodeIds.value.push(coord.id);
     } catch (error) {
         console.error("Fetch coordinates from local SQLite failed", error);
     }
@@ -81,7 +81,7 @@ function handleGuessClick(position) {
             realLng: realCoord.value.lng,
             round: round.value,
             gamemode: gamemode.value,
-            used: JSON.stringify(usedCoords.value),
+            used: JSON.stringify(usedNodeIds.value),
             meters: meters.value.toFixed(2),
             score: score.value.toFixed(0)
             }
@@ -100,7 +100,7 @@ function redirectToInitial() {
         query: {
             round: round.value,
             gamemode: gamemode.value,
-            used: JSON.stringify(usedCoords.value),
+            used: JSON.stringify(usedNodeIds.value),
             initialLat: initialCoord.value.lat,
             initialLng: initialCoord.value.lng,
             reload: reloadCounter.value

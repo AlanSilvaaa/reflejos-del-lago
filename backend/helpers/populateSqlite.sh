@@ -36,32 +36,32 @@ function sqlString(value) {
 
 console.log("PRAGMA foreign_keys = ON;");
 console.log("BEGIN TRANSACTION;");
-console.log("DROP TABLE IF EXISTS geogessr_node;");
-console.log("DROP TABLE IF EXISTS city;");
-console.log(`CREATE TABLE city (
+console.log("DROP TABLE IF EXISTS geoguessr_node;");
+console.log("DROP TABLE IF EXISTS municipality;");
+console.log(`CREATE TABLE municipality (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   latitude REAL NOT NULL,
   longitude REAL NOT NULL
 );`);
-console.log(`CREATE TABLE geogessr_node (
+console.log(`CREATE TABLE geoguessr_node (
   id INTEGER PRIMARY KEY,
-  city_id INTEGER NOT NULL,
+  municipality_id INTEGER NOT NULL,
   latitude REAL NOT NULL,
   longitude REAL NOT NULL,
-  FOREIGN KEY (city_id) REFERENCES city(id)
+  FOREIGN KEY (municipality_id) REFERENCES municipality(id)
 );`);
-console.log("CREATE INDEX idx_geogessr_node_city_id ON geogessr_node(city_id);");
+console.log("CREATE INDEX idx_geoguessr_node_municipality_id ON geoguessr_node(municipality_id);");
 
 for (const city of cities) {
   console.log(
-    `INSERT INTO city (name, latitude, longitude) VALUES (${sqlString(city.cityname)}, ${city.latitude}, ${city.longitude});`,
+    `INSERT INTO municipality (name, latitude, longitude) VALUES (${sqlString(city.cityname)}, ${city.latitude}, ${city.longitude});`,
   );
 }
 
 for (const coord of alotofCoords) {
   console.log(
-    `INSERT INTO geogessr_node (city_id, latitude, longitude) VALUES ((SELECT id FROM city WHERE name = ${sqlString(coord.cityname)}), ${coord.latitude}, ${coord.longitude});`,
+    `INSERT INTO geoguessr_node (municipality_id, latitude, longitude) VALUES ((SELECT id FROM municipality WHERE name = ${sqlString(coord.cityname)}), ${coord.latitude}, ${coord.longitude});`,
   );
 }
 
