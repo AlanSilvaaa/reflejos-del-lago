@@ -1,5 +1,5 @@
-import haversineDistance from "./haversineDistance.ts";
-import { getDatabase } from "../services/reflejosDb.ts";
+import haversineDistance from "../helpers/haversineDistance.ts";
+import { getDatabase, persistDatabase } from "../services/reflejosDb.ts";
 
 const EASY = 1000;
 const NORMAL = 5000;
@@ -29,6 +29,32 @@ function getDifficulty(
   return "HARD";
 }
 
+function ensureDifficultyColumnExists(db: any) {
+  const statement = db.prepare("PRAGMA table_info(geoguessr_node)");
+  let hasDifficultyColumn = false;
+
+  try {
+    while (statement.step()) {
+      const row = statement.getAsObject() as { name?: string };
+
+      if (row.name === "difficulty") {
+        hasDifficultyColumn = true;
+        break;
+      }
+    }
+  } finally {
+    statement.free();
+  }
+
+  if (!hasDifficultyColumn) {
+    db.run("ALTER TABLE geoguessr_node ADD COLUMN difficulty TEXT");
+    console.log("DEBUG: Added difficulty column to geoguessr_node");
+    return;
+  }
+
+  console.log("DEBUG: difficulty column already exists on geoguessr_node");
+}
+
 /**
  * Assigns the difficulty level to each node on the database based on the distance from that node to the center of the municipality.
  *
@@ -38,7 +64,6 @@ function getDifficulty(
  * - HARD: any distance over NORMAL
  */
 async function applyDifficultyToNodes() {
-  const difficulties: Difficulty[] = [];
   const difficultyFrequency: Record<Difficulty, number> = {
     EASY: 0,
     NORMAL: 0,
@@ -47,8 +72,11 @@ async function applyDifficultyToNodes() {
 
   try {
     const db = await getDatabase();
-    const statement = db.prepare(
+    ensureDifficultyColumnExists(db);
+
+    const selectStatement = db.prepare(
       `SELECT
+            node.id as id,
             node.latitude as nodeLat,
             node.longitude as nodeLon,
             m.latitude as muniLat,
@@ -56,23 +84,40 @@ async function applyDifficultyToNodes() {
         FROM geoguessr_node as node
         JOIN municipality as m ON m.id = node.municipality_id`,
     );
+    const updateStatement = db.prepare(
+      `UPDATE geoguessr_node
+       SET difficulty = ?
+       WHERE id = ?`,
+    );
+
+    let processedNodes = 0;
+
     try {
-      while (statement.step()) {
-        const row = statement.getAsObject();
-        const { nodeLat, nodeLon, muniLat, muniLon } = row;
-        console.log(row);
+      while (selectStatement.step()) {
+        const row = selectStatement.getAsObject() as {
+          id: number;
+          nodeLat: number;
+          nodeLon: number;
+          muniLat: number;
+          muniLon: number;
+        };
+        const { id, nodeLat, nodeLon, muniLat, muniLon } = row;
         const difficulty = getDifficulty(nodeLat, nodeLon, muniLat, muniLon);
-        difficulties.push(difficulty);
         difficultyFrequency[difficulty] += 1;
+        processedNodes += 1;
+        updateStatement.run([difficulty, id]);
         console.log(
-          `Difficulty for node at (${nodeLat}, ${nodeLon}): ${difficulty}`,
+          `Difficulty for node ${id} at (${nodeLat}, ${nodeLon}): ${difficulty}`,
         );
       }
     } finally {
-      statement.free();
+      selectStatement.free();
+      updateStatement.free();
     }
 
-    console.log("DEBUG: Total processed nodes:", difficulties.length);
+    await persistDatabase(db); // Save the updated database to disk
+
+    console.log("DEBUG: Total processed nodes:", processedNodes);
     console.log("DEBUG: Difficulty frequency:", difficultyFrequency);
   } catch (error) {
     console.error(error);
