@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { infiniteModeText, noMovementModeText, normalModeText } from '@/data/polaroids'
+import { describe, expect, it } from 'vitest'
 
 describe('polaroid game modes', () => {
   it('export the expected card structure', () => {
