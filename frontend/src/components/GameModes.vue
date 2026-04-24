@@ -1,6 +1,6 @@
 <template>
-  <div class="p-8 space-y-6">
-    <div class="relative flex justify-center">
+  <div :style="gameModesStyle">
+    <div :style="cardsStageStyle">
       <div @click="handleCardClick(0)" class="inline-flex absolute cursor-pointer" style="transform-style: preserve-3d;"
         ref="no_movement_mode">
         <Polaroid :data="noMovementModeText" @playGame="PlayGame"/>
@@ -34,6 +34,22 @@ const normal_mode = ref(null);
 const infinite_mode = ref(null);
 const items = [no_movement_mode, normal_mode, infinite_mode];
 const currentCenterCard = ref(1);
+const gameModesStyle = {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  padding: '2rem 0',
+}
+
+const cardsStageStyle = {
+  position: 'relative',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  maxWidth: '1200px',
+  minHeight: '420px',
+}
 
 const { play: flipCard } = useSound(flip_card);
 

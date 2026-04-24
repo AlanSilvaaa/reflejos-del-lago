@@ -5,12 +5,17 @@
         <!-- 360° background -->
         <ThreeSixtyView v-if="show360" image="example4" :style="threeSixtyStyle" />
         <!-- HEADER: top-aligned, but centered logo & text -->
-        <div class="relative z-10 bg-transparent pt-8 px-8 text-center">
-            <img src="../assets/images/logo.png" alt="logo" class="h-32 w-auto mx-auto" />
-            <p class="mt-4 text-white font-minecraft">
-                ¿Qué tanto conoces sobre la provincia de Llanquihue?
-            </p>
-            <GameModes class="mt-7" />
+        <div
+            class="relative z-10 bg-transparent px-8 text-center"
+            :style="heroContentStyle"
+        >
+            <div :style="heroBlockStyle">
+                <img src="../assets/images/logo.png" alt="logo" class="h-32 w-auto mx-auto" />
+                <p class="mt-4 text-white font-minecraft">
+                    ¿Qué tanto conoces sobre la provincia de Llanquihue?
+                </p>
+                <GameModes class="mt-7" />
+            </div>
         </div>
     </div>
 
@@ -157,6 +162,20 @@ const threeSixtyStyle = {
     height: '100%',
     opacity: '0.5',
     pointerEvents: 'none',
+};
+const heroContentStyle = {
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+};
+const heroBlockStyle = {
+    width: '100%',
+    maxWidth: '1200px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
 };
 
 onMounted(async () => {
