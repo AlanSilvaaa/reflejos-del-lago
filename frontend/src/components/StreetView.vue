@@ -33,11 +33,12 @@ const mapInstance = ref(null)
 const marker = ref(null)
 const googleMapComponent = ref(null)
 const panoramaInstance = ref(null)
+const streetViewElement = ref(null)
 
 watch(
-  () => props.realCoord,
-  (coord) => {
-    if (coord.lat === 0 || coord.lng === 0 || !window.google) {
+  [() => props.realCoord, streetViewElement],
+  ([coord, element]) => {
+    if (coord.lat === 0 || coord.lng === 0 || !window.google || !element) {
       return
     }
 
@@ -57,7 +58,7 @@ watch(
     }
 
     panoramaInstance.value = new google.maps.StreetViewPanorama(
-      document.getElementById('street-view'),
+      element,
       panoramaOptions,
     )
   },
@@ -100,7 +101,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative z-0" id="street-view" style="width: 100%; height: 100vh">
+  <div class="relative z-0" style="width: 100%; height: 100vh">
+    <div ref="streetViewElement" style="width: 100%; height: 100vh"></div>
     <StreetViewMiniMap
       v-model:google-map-component="googleMapComponent"
       :api-key="apiKey"

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GMaps from '@/components/GMaps.vue'
 import ResultsSummaryPanel from '@/components/ResultsSummaryPanel.vue'
+import haversineDistance from '@/helpers/haversineDistance.ts'
 
 const route = useRoute()
 const router = useRouter()
@@ -21,18 +22,6 @@ const realCoord = computed(() => ({
 const round = computed(() => parseInt(route.query.round, 10) || 1)
 const totalDistance = computed(() => parseFloat(route.query.meters) || 0)
 const previousScore = computed(() => parseFloat(route.query.score) || 0)
-
-function haversineDistance(from, to) {
-  const earthRadius = 6371000 // Meters
-  const toRadians = (degrees) => degrees * (Math.PI / 180)
-  const dLat = toRadians(to.lat - from.lat)
-  const dLng = toRadians(to.lng - from.lng)
-
-  const a = Math.sin(dLat / 2) ** 2
-    + Math.cos(toRadians(from.lat)) * Math.cos(toRadians(to.lat)) * Math.sin(dLng / 2) ** 2
-
-  return earthRadius * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
-}
 
 const roundDistance = computed(() => haversineDistance(guessCoord.value, realCoord.value))
 
