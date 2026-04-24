@@ -3,8 +3,7 @@
     <div class="relative min-h-screen">
 
         <!-- 360° background -->
-        <ThreeSixtyView v-if="show360" image="example4"
-            class="absolute inset-0 pointer-events-none w-full h-full opacity-50" />
+        <ThreeSixtyView v-if="show360" image="example4" :style="threeSixtyStyle" />
         <!-- HEADER: top-aligned, but centered logo & text -->
         <div class="relative z-10 bg-transparent pt-8 px-8 text-center">
             <img src="../assets/images/logo.png" alt="logo" class="h-32 w-auto mx-auto" />
@@ -151,6 +150,14 @@ import { ref, onMounted, nextTick  } from 'vue';
 
 const ThreeSixtyView = defineAsyncComponent(() => import('../components/ThreeSixtyView.vue'));
 const show360 = ref(false);
+const threeSixtyStyle = {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    opacity: '0.5',
+    pointerEvents: 'none',
+};
 
 onMounted(async () => {
     await nextTick();
