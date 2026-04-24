@@ -22,7 +22,12 @@ const props = defineProps({
 
 const imgExists = ref(false);
 
-const imageSrc = require(`@/assets/images/backgrounds/${props.image}.jpg`);
+const backgroundImages = import.meta.glob('@/assets/images/backgrounds/*.jpg', {
+  eager: true,
+  import: 'default'
+});
+
+const imageSrc = backgroundImages[`/src/assets/images/backgrounds/${props.image}.jpg`];
 
 const projection = new EquirectProjection({ src: imageSrc });
 

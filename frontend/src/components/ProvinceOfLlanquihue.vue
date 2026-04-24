@@ -10,7 +10,7 @@ import Calbuco from '@/data/boundaries/Calbuco.json'
 import Cochamo from '@/data/boundaries/Cochamo.json'
 import Fresia from '@/data/boundaries/Fresia.json'
 
-const api_key = process.env.VUE_APP_GOOGLE_MAPS_API_KEY
+const api_key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const center = { lat: -41.471798, lng: -72.9395915 }
 
 const PuertoVarasOutline = PuertoVaras.map((ring) => ({

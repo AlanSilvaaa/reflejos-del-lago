@@ -16,8 +16,8 @@ const ProvinciaDeLlanquihueOutline = ProvinciaDeLlanquihue.map((ring) => ({
   clickable: false
 }))
 
-const apiKey = process.env.VUE_APP_GOOGLE_MAPS_API_KEY
-const mapId = process.env.VUE_APP_GOOGLE_MAP_ID
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+const mapId = import.meta.env.VITE_GOOGLE_MAP_ID
 const route = useRoute()
 const router = useRouter()
 

@@ -22,7 +22,7 @@ const ProvinciaDeLlanquihueOutline = ProvinciaDeLlanquihue.map((ring) => ({
 
 const emits = defineEmits(['guessClick'])
 const clickedPosition = ref(null)
-const apiKey = process.env.VUE_APP_GOOGLE_MAPS_API_KEY;
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const center_minimap = { lat: -41.333333333333, lng: -72.833333333333 };
 const mapInstance = ref(null)
 const marker = ref(null)

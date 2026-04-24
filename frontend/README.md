@@ -1,5 +1,5 @@
 # Frontend
-This is the frontend of the app. It works ussing vue3, builded with cli.
+This is the frontend of the app. It uses Vue 3 and is built with Vite.
 
 ## Requirements
 - pnpm
@@ -14,8 +14,8 @@ pnpm install
 
 Then, make sure you have an .env file that contains the following:
 ```bash
-VUE_APP_GOOGLE_MAPS_API_KEY=your_api_key
-VUE_APP_GOOGLE_MAP_ID=your_map_id
+VITE_GOOGLE_MAPS_API_KEY=your_api_key
+VITE_GOOGLE_MAP_ID=your_map_id
 ```
 
 ## Run the frontend

@@ -4,10 +4,10 @@ let nodesPromise
 
 async function loadDatabase() {
   const SQL = await initSqlJs({
-    locateFile: () => `${process.env.BASE_URL}sql-wasm.wasm`,
+    locateFile: () => `${import.meta.env.BASE_URL}sql-wasm.wasm`,
   })
 
-  const response = await fetch(`${process.env.BASE_URL}reflejos.sqlite3`)
+  const response = await fetch(`${import.meta.env.BASE_URL}reflejos.sqlite3`)
 
   if (!response.ok) {
     throw new Error(`No se pudo cargar reflejos.sqlite3: ${response.status}`)

@@ -1,6 +1,10 @@
+import normalModeImage from '../assets/images/modes/normal_mode.png'
+import noMovementModeImage from '../assets/images/modes/no_movement_mode.png'
+import infiniteModeImage from '../assets/images/modes/infinite_mode.png'
+
 export const normalModeText = {
     front: {
-        img: require("../assets/images/modes/normal_mode.png"),
+        img: normalModeImage,
         title: "Modo normal",
         highscore: "1800 pts.",
     },
@@ -13,7 +17,7 @@ export const normalModeText = {
 
 export const noMovementModeText = {
     front: {
-        img: require("../assets/images/modes/no_movement_mode.png"),
+        img: noMovementModeImage,
         title: "Sin movimiento",
         highscore: "80 pts.",
     },
@@ -26,7 +30,7 @@ export const noMovementModeText = {
 
 export const infiniteModeText = {
     front: {
-        img: require("../assets/images/modes/infinite_mode.png"),
+        img: infiniteModeImage,
         title: "Modo infinito",
         highscore: "3500 pts.",
     },
