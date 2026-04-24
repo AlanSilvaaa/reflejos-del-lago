@@ -1,14 +1,15 @@
 name: Linter
 on: [push]
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v4
-              with:
-                node-version: '18.x'
-            - run: npm install -g pnpm@latest-10
-              working-directory: frontend
-            - run: cd frontend && pnpm install
-            - run: cd frontend && pnpm run lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+      - run: npm install -g pnpm@latest-10
+        working-directory: frontend
+      - run: cd frontend && pnpm install
+      - run: cd frontend && pnpm run lint
+
