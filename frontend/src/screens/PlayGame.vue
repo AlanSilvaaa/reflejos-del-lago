@@ -2,7 +2,7 @@
 import StreetView from '@/components/StreetView.vue';
 import { ref, onMounted, watch, onBeforeUnmount  } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
+import { getRandomNode } from '@/services/reflejosDb';
 import Button from 'primevue/button';
 
 
@@ -35,16 +35,7 @@ const realCoord = ref({ lat: 0, lng: 0 });
 
 async function fetchRandomCoord() {
     try {
-        let coord;
-        let isRepeated = true;
-
-        while (isRepeated) {
-            const response = await axios.get('http://localhost:3000/coordinates');
-            coord = response.data;
-            isRepeated = usedCoords.value.some(
-                c => c.lat === coord.lat && c.lng === coord.lng
-            );
-        }
+        const coord = await getRandomNode(usedCoords.value);
 
         realCoord.value = coord;
         if (!initialCoord.value) {
@@ -52,7 +43,7 @@ async function fetchRandomCoord() {
         }
         usedCoords.value.push({ lat: coord.lat, lng: coord.lng });
     } catch (error) {
-        console.error("Fetch coordinates failed", error);
+        console.error("Fetch coordinates from local SQLite failed", error);
     }
 }
 

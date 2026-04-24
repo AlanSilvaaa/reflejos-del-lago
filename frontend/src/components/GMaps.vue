@@ -5,7 +5,6 @@ import { ref, onMounted, computed } from 'vue'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import ProvinciaDeLlanquihue from '@/data/boundaries/ProvinciaDeLlanquihue.json'
-import axios from 'axios'
 
 const ProvinciaDeLlanquihueOutline = ProvinciaDeLlanquihue.map((ring) => ({
   paths: ring,
@@ -115,8 +114,6 @@ function PlayAgain() {
 const DisplayResults = ref(false)
 function DResults() {
   DisplayResults.value = true
-  sendGameData()
-  console.log("Enviando datos del juego...")
 }
 
 function BackMenu() {
@@ -133,17 +130,6 @@ const formattedDistance = computed(() => {
     return `${value.toFixed(2)} metros`;
   }
 });
-
-let sendGameData = function () {
-  axios.put('http://localhost:3000/saveGameData', { gamemode: route.query.gamemode, score: sum_score.value, rounds: route.query.used }, { withCredentials: true })
-    .then(response => {
-      console.log('Type updated successfully:', response.data);
-    }).catch(err => {
-      // errorMessage.value = err.response?.data?.error || 'Error desconocido';
-      console.log('Error al enviar los datos del juego:', err);
-    });
-}
-
 
 </script>
 
@@ -223,6 +209,7 @@ let sendGameData = function () {
         <template #content>
           <p>{{ formattedDistance }}</p>
           <p>Puntaje total: {{ sum_score }}</p>
+          <p>Resultados calculados localmente en esta sesion.</p>
           <div>
             <Button label="Volver a jugar" @click="PlayAgain" style="margin-top: 1rem; width: 100%;"></Button>
             <Button label="Volver al menú" @click="BackMenu" style="margin-top: 1rem; width: 100%;"></Button>

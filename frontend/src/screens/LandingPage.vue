@@ -1,71 +1,10 @@
 <template>
     <!-- Polaroid container with 360° background -->
-    <Dialog v-model:visible="loginRegisterVisible" :header="(isLoginScreen) ? 'Login' : 'Register'"
-        :style="{ width: '25rem' }" position="topright" :modal="true" :draggable="false">
-
-        <div v-if=(currentUser) class="flex flex-col gap-4 w-full">
-            <h1>Bienvenido, {{ currentUser.username }}!</h1>
-            <Button v-if="currentUser" text size="small" label="Cerrar sesión" severity="danger" @click="logout" />
-        </div>
-        <div v-else>
-            <span class="text-surface-500 dark:text-surface-400 block mb-8">
-                {{ isLoginScreen ? 'Inicia sesión con tus credenciales.' : 'Crea una cuenta nueva.' }}
-            </span>
-            <div v-if="isLoginScreen" class="flex flex-col gap-4 w-full">
-                <!-- LOGIN FORM -->
-                <IftaLabel class="w-full">
-                    <InputText id="username" v-model="username" class="w-full" />
-                    <label for="username">Usuario</label>
-                </IftaLabel>
-                <IftaLabel class="w-full my-4">
-                    <InputText id="password" v-model="password" class="w-full" type="password" />
-                    <label for="password">Contraseña</label>
-                </IftaLabel>
-                <Message v-if="errorMessage" severity="error" size="small" variant="simple" :closable="false"
-                    class="mb-4">
-                    {{ errorMessage }}
-                </Message>
-                <div class="flex justify-end gap-2">
-                    <Button label="Entrar" @click="sendLogin" class="w-full" />
-                </div>
-            </div>
-            <div v-else class="flex flex-col gap-4 w-full">
-                <!-- REGISTER FORM -->
-                <IftaLabel class="w-full">
-                    <InputText id="username" v-model="username" class="w-full" />
-                    <label for="username">Usuario</label>
-                </IftaLabel>
-                <IftaLabel class="w-full my-4">
-                    <InputText id="password" v-model="password" class="w-full" type="password" />
-                    <label for="password">Contraseña</label>
-                </IftaLabel>
-                <Message v-if="errorMessage" severity="error" size="small" variant="simple" :closable="false"
-                    class="mb-4">
-                    {{ errorMessage }}
-                </Message>
-                <div class="flex justify-end gap-2">
-                    <Button label="Registrarse" @click="sendRegister" class="w-full" />
-                </div>
-            </div>
-            <!-- TOGGLE BUTTON -->
-            <div class="text-center mt-6 flex justify-center">
-                <Button text size="small" @click="isLoginScreen = !isLoginScreen"
-                    :label="isLoginScreen ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'" />
-            </div>
-        </div>
-
-    </Dialog>
-
     <div class="relative min-h-screen">
 
         <!-- 360° background -->
         <ThreeSixtyView v-if="show360" image="example4"
             class="absolute inset-0 pointer-events-none w-full h-full opacity-50" />
-        <div class="absolute top-2 right-2 z-20">
-            <Avatar icon="pi pi-user" class="cursor-pointer bg-green-500 text-white" size="large" shape="circle"
-                @click="openPosition" />
-        </div>
-
         <!-- HEADER: top-aligned, but centered logo & text -->
         <div class="relative z-10 bg-transparent pt-8 px-8 text-center">
             <img src="../assets/images/logo.png" alt="logo" class="h-32 w-auto mx-auto" />
@@ -79,7 +18,7 @@
     <!-- Welcome -->
     <div class="mx-24">
         <h1 class="text-center text-4xl font-minecraft mt-4">Bienvenido</h1>
-        <div class="grid grid-cols-2 gap-4 justify-items-center">
+        <div class="grid grid-cols-1 gap-4 justify-items-center lg:grid-cols-2">
             <!-- First element -->
             <Card style="width: 25rem; overflow: hidden">
                 <template #header>
@@ -101,23 +40,17 @@
             </Card>
 
             <!-- Second element -->
-            <DataTable :value="leaderboard" class="w-full">
-                <template #header>
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                        <span class="text-xl font-bold">Tabla de clasificaciones</span>
-                        <Button @click="loadLeaderboard" icon="pi pi-refresh" rounded raised />
-                    </div>
+            <Card style="width: 100%; max-width: 32rem; overflow: hidden">
+                <template #title>Modo local</template>
+                <template #subtitle>Sin backend ni tabla de usuarios</template>
+                <template #content>
+                    <p class="m-0">
+                        Esta version carga los puntos del juego directamente desde el archivo local
+                        <code>reflejos.sqlite3</code>. Ya no necesitas levantar el backend, Docker ni la tabla de
+                        usuarios y puntajes para jugar.
+                    </p>
                 </template>
-                <Column header="">
-                    <template #body="slotProps">
-                        {{ slotProps.index + 1 }}
-                    </template>
-                </Column>
-                <Column field="username" header="Nombre"></Column>
-                <Column field="score" header="Puntaje"></Column>
-                <Column field="total_plays" header="Partidas jugadas"></Column>
-                <Column field="average_score" header="Puntaje promedio"></Column>
-            </DataTable>
+            </Card>
         </div>
         <div class="w-full my-5">
             <!-- <h1 class="font-bold text-2xl">Modos</h1>
@@ -207,101 +140,24 @@ import GameModes from '@/components/GameModes.vue';
 import ProvinceOfLlanquihue from '@/components/ProvinceOfLlanquihue.vue';
 import Card from 'primevue/card';
 import Accordion from 'primevue/accordion';
-import Button from 'primevue/button';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import IftaLabel from 'primevue/iftalabel';
-import Message from 'primevue/message';
-import Avatar from 'primevue/avatar';
-// import { leaderboard } from '@/data/leaderboard';
 // import ThreeSixtyView from '../components/ThreeSixtyView.vue'
 import { defineAsyncComponent } from 'vue';
-import axios from 'axios'
 import { ref, onMounted, nextTick  } from 'vue';
 // import ColumnGroup from 'primevue/columngroup';   // optional
 // import Row from 'primevue/row';   
 
 const ThreeSixtyView = defineAsyncComponent(() => import('../components/ThreeSixtyView.vue'));
-let leaderboard = ref([])
 const show360 = ref(false);
-const loginRegisterVisible = ref(false);
-const username = ref('');
-const password = ref('');
-const isLoginScreen = ref(true);
-const currentUser = ref(null);
-const errorMessage = ref('');
 
 onMounted(async () => {
-    loadLeaderboard();
-    getUserData();
-
     await nextTick();
 
     setTimeout(() => {
         show360.value = true;
     }, 300);
 });
-
-const openPosition = () => {
-    loginRegisterVisible.value = true;
-    isLoginScreen.value = true; // always open in login first
-};
-
-let loadLeaderboard = function () {
-    console.log('Loading leaderboard...');
-    axios.get('http://localhost:3000/leaderboard').then(response => {
-        leaderboard.value = response.data.users;
-    })
-}
-
-let getUserData = function () {
-    console.log('getting user data...');
-    axios.get('http://localhost:3000/landingPage', { withCredentials: true })
-        .then(response => {
-            console.log("User is logged in:", response.data);
-            currentUser.value = response.data.user;
-        })
-        .catch(err => {
-            console.warn("User not logged in", err);
-            currentUser.value = null;
-        });
-}
-
-let sendRegister = function () {
-    axios.put('http://localhost:3000/user/register', { username: username.value, password: password.value })
-        .then(response => {
-            console.log('Type updated successfully:', response.data);
-        }).catch(err => {
-            errorMessage.value = err.response?.data?.error || 'Error desconocido';
-        });
-}
-
-let sendLogin = function () {
-    axios.post('http://localhost:3000/user/login', { username: username.value, password: password.value }, { withCredentials: true })
-        .then(response => {
-            console.log('Login successful:', response.data);
-            window.location.reload();
-        })
-        .catch(err => {
-            errorMessage.value = err.response?.data?.error || 'Error desconocido';
-        });
-}
-
-const logout = async () => {
-    try {
-        await axios.post('http://localhost:3000/user/logout', {}, { withCredentials: true });
-        currentUser.value = null;
-        loginRegisterVisible.value = false;
-        console.log("Logged out");
-        window.location.reload();
-    } catch (err) {
-        console.error("Logout failed", err);
-    }
-};
 
 </script>
