@@ -19,11 +19,9 @@ jobs:
         run: npm install -g pnpm@latest-10
 
       - name: Install dependencies
-        working-directory: frontend
         run: pnpm install
 
       - name: Build frontend
-        working-directory: frontend
         env:
           VUE_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.VUE_APP_GOOGLE_MAPS_API_KEY }}
           VUE_APP_GOOGLE_MAP_ID: ${{ secrets.VUE_APP_GOOGLE_MAP_ID }}
@@ -32,7 +30,6 @@ jobs:
           pnpm run build
 
       - name: Commit dist folder
-        working-directory: frontend
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -50,4 +47,3 @@ jobs:
         run: |
           git remote set-url origin git@github.com:${{ github.repository }}.git
           git push origin `git subtree split --prefix frontend/dist HEAD`:gh-pages --force
-

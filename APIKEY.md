@@ -1,5 +1,12 @@
 # API Key Setup Instructions
 
+This project uses the Google Maps JavaScript API to display maps and Street View. In the end, you should have a .env file in the frontend/ directory with the following content:
+
+```bash
+VITE_GOOGLE_MAPS_API_KEY=your_api_key
+VITE_GOOGLE_MAP_ID=your_map_id
+```
+
 1. Create or select a Google Cloud project for this app.
 
 2. Enable these APIs:

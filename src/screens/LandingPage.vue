@@ -53,14 +53,7 @@
 
 <script setup>
 import GameModes from '@/components/GameModes.vue';
-import ProvinceOfLlanquihue from '@/components/ProvinceOfLlanquihue.vue';
 import Button from 'primevue/button';
-import Card from 'primevue/card';
-import Dialog from 'primevue/dialog';
-import Accordion from 'primevue/accordion';
-import AccordionPanel from 'primevue/accordionpanel';
-import AccordionHeader from 'primevue/accordionheader';
-import AccordionContent from 'primevue/accordioncontent';
 import { defineAsyncComponent } from 'vue';
 import { ref, onMounted, nextTick  } from 'vue';
 import AboutModal from '@/components/AboutModal.vue';

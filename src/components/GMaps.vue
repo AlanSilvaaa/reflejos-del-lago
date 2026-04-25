@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue'
 import { GoogleMap, AdvancedMarker, Polyline, Polygon } from 'vue3-google-map'
 import ProvinciaDeLlanquihue from '@/data/boundaries/ProvinciaDeLlanquihue.json'
 
@@ -26,31 +27,24 @@ const ProvinciaDeLlanquihueOutline = ProvinciaDeLlanquihue.map((ring) => ({
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const mapId = import.meta.env.VITE_GOOGLE_MAP_ID
 
-const center = props.realCoord
-
-const line_coordinates = [
-  props.guessCoord,
-  props.realCoord,
-]
-
-const line_properties = {
-  path: line_coordinates,
+const lineProperties = computed(() => ({
+  path: [props.guessCoord, props.realCoord],
   geodesic: true,
   strokeColor: '#FF0000',
   strokeOpacity: 1.0,
   strokeWeight: 2,
-}
+}))
 </script>
 
 <template>
   <div class="relative z-0">
     <GoogleMap :api-key="apiKey" :map-id="mapId" style="width: 100%; height: 100vh" :libraries="['marker']"
-      :center="center" :zoom="12" :disable-default-ui="true">
+      :center="realCoord" :zoom="12" :disable-default-ui="true">
       <AdvancedMarker :options="{ position: guessCoord }"
         :pin-options="{ background: '#2b4cf0', borderColor: '#000000', glyph: '📍' }" />
       <AdvancedMarker :options="{ position: realCoord }"
         :pin-options="{ background: '#2bf060', borderColor: '#000000', glyph: '✅' }" />
-      <Polyline :options="line_properties" />
+      <Polyline :options="lineProperties" />
       <Polygon v-for="(opts, idx) in ProvinciaDeLlanquihueOutline" :key="idx" :options="opts" />
     </GoogleMap>
   </div>
