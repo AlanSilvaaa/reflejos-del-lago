@@ -1,7 +1,4 @@
 import initSqlJs from "sql.js";
-import { writeFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 let dbPromise: Promise<any> | undefined;
 const SQLITE_DB_VERSION = "2026-04-24-schema-rename";
@@ -119,15 +116,20 @@ export async function getRandomNode(usedNodeIds: number[] = []) {
   return node;
 }
 
-function getDatabaseFilePath() {
+export async function persistDatabase(db: any) {
+  if (isBrowserEnvironment()) {
+    throw new Error("persistDatabase can only be used in Node");
+  }
+
+  const [{ writeFile }, path, { fileURLToPath }] = await Promise.all([
+    import("node:fs/promises"),
+    import("node:path"),
+    import("node:url"),
+  ]);
+
   const currentFile = fileURLToPath(import.meta.url);
   const currentDir = path.dirname(currentFile);
-
-  return path.resolve(currentDir, "../../public/reflejos.sqlite3");
-}
-
-export async function persistDatabase(db: any) {
-  const databaseFilePath = getDatabaseFilePath();
+  const databaseFilePath = path.resolve(currentDir, "../../public/reflejos.sqlite3");
   const exportedDatabase = db.export();
 
   await writeFile(databaseFilePath, exportedDatabase);
