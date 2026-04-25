@@ -46,6 +46,10 @@ function handlePlayGame() {
 }
 
 function hoverCard() {
+  if (!card.value) {
+    return;
+  }
+
   hoverCardSound();
   gsap.to(card.value, {
     y: -30,
@@ -55,6 +59,10 @@ function hoverCard() {
 }
 
 function unhoverCard() {
+  if (!card.value) {
+    return;
+  }
+
   gsap.to(card.value, {
     y: 0,
     duration: 0.3,

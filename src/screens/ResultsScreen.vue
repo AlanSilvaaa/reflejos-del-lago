@@ -1,98 +1,75 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import GMaps from '@/components/GMaps.vue'
 import ResultsSummaryPanel from '@/components/ResultsSummaryPanel.vue'
-import haversineDistance from '@/helpers/haversineDistance.ts'
 
-const route = useRoute()
-const router = useRouter()
+const props = defineProps({
+  guessCoord: {
+    type: Object,
+    required: true,
+  },
+  realCoord: {
+    type: Object,
+    required: true,
+  },
+  round: {
+    type: Number,
+    required: true,
+  },
+  roundDistance: {
+    type: Number,
+    required: true,
+  },
+  roundScore: {
+    type: Number,
+    required: true,
+  },
+  totalScore: {
+    type: Number,
+    required: true,
+  },
+  accumulatedDistance: {
+    type: Number,
+    required: true,
+  },
+  isLastRound: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const emit = defineEmits(['nextRound', 'playAgain', 'backToMenu'])
+
 const showFinalResults = ref(false)
 
-const guessCoord = computed(() => ({
-  lat: parseFloat(route.query.miniLat),
-  lng: parseFloat(route.query.miniLng),
-}))
-
-const realCoord = computed(() => ({
-  lat: parseFloat(route.query.realLat),
-  lng: parseFloat(route.query.realLng),
-}))
-
-const round = computed(() => parseInt(route.query.round, 10) || 1)
-const totalDistance = computed(() => parseFloat(route.query.meters) || 0)
-const previousScore = computed(() => parseFloat(route.query.score) || 0)
-
-const roundDistance = computed(() => haversineDistance(guessCoord.value, realCoord.value))
-
-const roundScore = computed(() => {
-  const maxScore = 5000
-  const threshold = 50
-  const decay = 0.0005
-
-  if (roundDistance.value <= threshold) {
-    return maxScore
-  }
-
-  return Math.round(maxScore * Math.exp(-decay * (roundDistance.value - threshold)))
+const displayRoundDistance = computed(() => {
+  return `${props.roundDistance.toFixed(2)} metros`
 })
-
-const totalScore = computed(() => previousScore.value + roundScore.value)
-const accumulatedDistance = computed(() => totalDistance.value + roundDistance.value)
-const isLastRound = computed(() => round.value >= 3)
-
-const formattedRoundDistance = computed(() => `${roundDistance.value.toFixed(2)} metros`)
 
 const formattedTotalDistance = computed(() => {
-  if (accumulatedDistance.value >= 1000) {
-    return `${(accumulatedDistance.value / 1000).toFixed(2)} kilómetros`
+  if (props.accumulatedDistance >= 1000) {
+    return `${(props.accumulatedDistance / 1000).toFixed(2)} kilómetros`
   }
 
-  return `${accumulatedDistance.value.toFixed(2)} metros`
+  return `${props.accumulatedDistance.toFixed(2)} metros`
 })
-
-function nextRound() {
-  router.push({
-    path: '/PlayGame',
-    query: {
-      round: round.value + 1,
-      gamemode: route.query.gamemode,
-      used: route.query.used,
-      meters: accumulatedDistance.value.toFixed(2),
-      score: totalScore.value.toFixed(0),
-    },
-  })
-}
-
-function playAgain() {
-  router.push({
-    path: '/PlayGame',
-    query: {
-      gamemode: route.query.gamemode,
-    },
-  })
-}
-
-function backToMenu() {
-  router.push({ path: '/' })
-}
 </script>
 
 <template>
   <div class="relative">
     <GMaps :guess-coord="guessCoord" :real-coord="realCoord" />
     <ResultsSummaryPanel
-      :distance="formattedRoundDistance"
+      :distance="displayRoundDistance"
       :round-score="roundScore"
       :total-score="totalScore"
       :round="round"
       :is-last-round="isLastRound"
       :show-final-results="showFinalResults"
       :formatted-total-distance="formattedTotalDistance"
-      @next-round="nextRound"
+      @next-round="emit('nextRound')"
       @show-final-results="showFinalResults = true"
-      @play-again="playAgain"
-      @back-to-menu="backToMenu"
+      @play-again="emit('playAgain')"
+      @back-to-menu="emit('backToMenu')"
     />
   </div>
 </template>

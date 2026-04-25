@@ -1,4 +1,8 @@
-<!-- Wraps the whole app into a router-view -->
+<script setup>
+import Toast from 'primevue/toast'
+</script>
+
 <template>
+  <Toast />
   <router-view />
 </template>

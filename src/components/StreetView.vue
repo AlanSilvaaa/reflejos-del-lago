@@ -1,6 +1,6 @@
 <script setup>
 /* global google */
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import StreetViewMiniMap from '@/components/StreetViewMiniMap.vue'
 import ProvinciaDeLlanquihue from '@/data/boundaries/ProvinciaDeLlanquihue.json'
 
@@ -34,36 +34,68 @@ const marker = ref(null)
 const googleMapComponent = ref(null)
 const panoramaInstance = ref(null)
 const streetViewElement = ref(null)
+let panoramaRetryInterval = null
 
 watch(
   [() => props.realCoord, streetViewElement],
   ([coord, element]) => {
-    if (coord.lat === 0 || coord.lng === 0 || !window.google || !element) {
+    if (coord.lat === 0 || coord.lng === 0 || !element) {
       return
     }
 
-    const panoramaOptions = {
-      position: coord,
-      pov: { heading: 165, pitch: 0 },
-      zoom: 1,
-      addressControl: false,
-      disableDefaultUI: true,
-      showRoadLabels: false,
-    }
-
-    if (props.gamemode === 'Sin movimiento') {
-      panoramaOptions.clickToGo = false
-      panoramaOptions.linksControl = false
-      panoramaOptions.panControl = false
-    }
-
-    panoramaInstance.value = new google.maps.StreetViewPanorama(
-      element,
-      panoramaOptions,
-    )
+    initializePanorama(coord, element)
   },
   { immediate: true },
 )
+
+function buildPanoramaOptions(coord) {
+  const panoramaOptions = {
+    position: coord,
+    pov: { heading: 165, pitch: 0 },
+    zoom: 1,
+    addressControl: false,
+    disableDefaultUI: true,
+    showRoadLabels: false,
+  }
+
+  if (props.gamemode === 'Sin movimiento') {
+    panoramaOptions.clickToGo = false
+    panoramaOptions.linksControl = false
+    panoramaOptions.panControl = false
+  }
+
+  return panoramaOptions
+}
+
+function initializePanorama(coord, element) {
+  const StreetViewPanorama = window.google?.maps?.StreetViewPanorama
+
+  if (typeof StreetViewPanorama !== 'function') {
+    clearInterval(panoramaRetryInterval)
+    panoramaRetryInterval = setInterval(() => {
+      const RetryStreetViewPanorama = window.google?.maps?.StreetViewPanorama
+
+      if (typeof RetryStreetViewPanorama !== 'function') {
+        return
+      }
+
+      clearInterval(panoramaRetryInterval)
+      panoramaRetryInterval = null
+      panoramaInstance.value = new RetryStreetViewPanorama(
+        element,
+        buildPanoramaOptions(coord),
+      )
+    }, 200)
+    return
+  }
+
+  clearInterval(panoramaRetryInterval)
+  panoramaRetryInterval = null
+  panoramaInstance.value = new StreetViewPanorama(
+    element,
+    buildPanoramaOptions(coord),
+  )
+}
 
 function submitGuess() {
   if (!clickedPosition.value) {
@@ -96,6 +128,10 @@ onMounted(() => {
       })
     }
   }, 200)
+})
+
+onBeforeUnmount(() => {
+  clearInterval(panoramaRetryInterval)
 })
 
 </script>

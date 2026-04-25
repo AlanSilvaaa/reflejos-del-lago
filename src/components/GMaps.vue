@@ -38,12 +38,12 @@ const lineProperties = computed(() => ({
 
 <template>
   <div class="relative z-0">
-    <GoogleMap :api-key="apiKey" :map-id="mapId" style="width: 100%; height: 100vh" :libraries="['marker']"
+    <GoogleMap :api-key="apiKey" :map-id="mapId" style="width: 100%; height: 100vh" :libraries="['places', 'marker']"
       :center="realCoord" :zoom="12" :disable-default-ui="true">
       <AdvancedMarker :options="{ position: guessCoord }"
-        :pin-options="{ background: '#2b4cf0', borderColor: '#000000', glyph: '📍' }" />
+        :pin-options="{ background: '#2b4cf0', borderColor: '#000000', glyphText: '📍' }" />
       <AdvancedMarker :options="{ position: realCoord }"
-        :pin-options="{ background: '#2bf060', borderColor: '#000000', glyph: '✅' }" />
+        :pin-options="{ background: '#2bf060', borderColor: '#000000', glyphText: '✅' }" />
       <Polyline :options="lineProperties" />
       <Polygon v-for="(opts, idx) in ProvinciaDeLlanquihueOutline" :key="idx" :options="opts" />
     </GoogleMap>

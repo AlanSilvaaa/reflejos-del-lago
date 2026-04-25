@@ -29,6 +29,7 @@ defineEmits(['submitGuess'])
     <GoogleMap
       ref="googleMapComponent"
       :api-key="apiKey"
+      :libraries="['places', 'marker']"
       style="height: 300px;"
       :center="center"
       :zoom="7"

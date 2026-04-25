@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import gsap from "gsap";
 import Polaroid from "@/components/PolaroidPhoto.vue";
@@ -27,6 +27,7 @@ import flip_card from "../assets/sounds/card_flipped.wav";
 import { useSound } from "@vueuse/sound";
 
 const router = useRouter();
+const GAME_SESSION_STORAGE_KEY = 'game-session';
 const flipped = ref(false);
 const SPACING = 360;
 const no_movement_mode = ref(null);
@@ -34,6 +35,7 @@ const normal_mode = ref(null);
 const infinite_mode = ref(null);
 const items = [no_movement_mode, normal_mode, infinite_mode];
 const currentCenterCard = ref(1);
+const floatingTimeline = ref(null);
 const gameModesStyle = {
   width: '100%',
   display: 'flex',
@@ -54,15 +56,20 @@ const cardsStageStyle = {
 const { play: flipCard } = useSound(flip_card);
 
 function PlayGame(gamemode) {
-    console.log(gamemode);
+  window.sessionStorage.removeItem(GAME_SESSION_STORAGE_KEY);
   router.push({
-    path: "/PlayGame",
+    path: "/Game",
     query: {gamemode: gamemode}});
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick();
   initialAnimation();
   playAnimation();
+});
+
+onBeforeUnmount(() => {
+  floatingTimeline.value?.kill();
 });
 
 
@@ -98,10 +105,18 @@ function handleFlipCard(index) {
 function moveCards(index) {
   const prevCardIndex = (index + items.length - 1) % items.length;
   const nextCardIndex = (index + 1) % items.length;
+  const currentItem = items[index].value;
+  const nextItem = items[nextCardIndex].value;
+  const previousItem = items[prevCardIndex].value;
+
+  if (!currentItem || !nextItem || !previousItem) {
+    return;
+  }
+
   const tl = gsap.timeline();
 
   tl.to(
-    items[index].value,
+    currentItem,
     {
       x: 0,
       scale: 1.2,
@@ -114,7 +129,7 @@ function moveCards(index) {
   );
 
   tl.to(
-    items[nextCardIndex].value,
+    nextItem,
     {
       x: SPACING,
       scale: 1,
@@ -124,7 +139,7 @@ function moveCards(index) {
   );
 
   tl.to(
-    items[prevCardIndex].value,
+    previousItem,
     {
       x: -SPACING,
       scale: 1,
@@ -139,8 +154,13 @@ function moveCards(index) {
  * Alternates between 0° (front) and 180° (back).
  */
 function rotateCard() {
-  flipCard();
   const centerCard = items[currentCenterCard.value].value;
+
+  if (!centerCard) {
+    return;
+  }
+
+  flipCard();
   const target = flipped.value ? 0 : 180;
   gsap.to(centerCard, {
     transformOrigin: "center center",
@@ -163,8 +183,14 @@ function playAnimation() {
     no_movement_mode.value,
     normal_mode.value,
     infinite_mode.value
-  ];
-  gsap
+  ].filter(Boolean);
+
+  if (elements.length !== items.length) {
+    return;
+  }
+
+  floatingTimeline.value?.kill();
+  floatingTimeline.value = gsap
     .timeline({ repeat: -1 })
     .to(elements, {
       y: -10,
@@ -186,6 +212,10 @@ function playAnimation() {
  * The cards move to their respective positions with a stagger effect.
  */
 function initialAnimation() {
+  if (!infinite_mode.value || !no_movement_mode.value || !normal_mode.value) {
+    return;
+  }
+
   gsap.to(infinite_mode.value, {
     x: SPACING,
     duration: 1,
