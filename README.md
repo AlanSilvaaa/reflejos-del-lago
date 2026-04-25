@@ -4,7 +4,7 @@
 
 <div align=center>
     <img src="https://img.shields.io/github/actions/workflow/status/AlanSilvaaa/reflejos-del-lago/linter.yml?logo=eslint&label=Linter" alt="Badge of linter">
-    <img src="https://img.shields.io/github/actions/workflow/status/AlanSilvaaa/reflejos-del-lago/tests.yml?logo=jest&label=Tests" alt="Badge of tests">
+    <img src="https://img.shields.io/github/actions/workflow/status/AlanSilvaaa/reflejos-del-lago/tests.yml?logo=vitest&label=Tests" alt="Badge of tests">
     <img src="https://img.shields.io/github/actions/workflow/status/AlanSilvaaa/reflejos-del-lago/deploy.yml?logo=iCloud&label=Deploy" alt="Badge of deploy">
 </div>
 
