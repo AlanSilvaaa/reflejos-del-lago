@@ -17,7 +17,7 @@ Play the game [here!](https://AlanSilvaaa.github.io/reflejos-del-lago/#/)
 ### Locally
 
 > [!IMPORTANT]
-> the project uses a `.env` file that is not commited to the repository for accessing the API keys. The instructions to create this file are on [this](./APIKEY.md) file.
+> the project uses a `.env` file that is not commited to the repository for accessing the API keys. The instructions to create this file are [here](./APIKEY.md) file.
 
 First, clone the repository
 
