@@ -13,7 +13,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: "20.x"
 
       - name: Install pnpm
         run: npm install -g pnpm@latest-10
@@ -23,10 +23,10 @@ jobs:
 
       - name: Build frontend
         env:
-          VUE_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.VUE_APP_GOOGLE_MAPS_API_KEY }}
-          VUE_APP_GOOGLE_MAP_ID: ${{ secrets.VUE_APP_GOOGLE_MAP_ID }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VUE_APP_GOOGLE_MAPS_API_KEY }}
+          VITE_GOOGLE_MAP_ID: ${{ secrets.VUE_APP_GOOGLE_MAP_ID }}
         run: |
-          echo "Building with map ID: $VUE_APP_GOOGLE_MAP_ID"
+          echo "Building with map ID: $VITE_GOOGLE_MAP_ID"
           pnpm run build
 
       - name: Commit dist folder
@@ -46,4 +46,4 @@ jobs:
       - name: Push to gh-pages via git subtree (SSH)
         run: |
           git remote set-url origin git@github.com:${{ github.repository }}.git
-          git push origin `git subtree split --prefix frontend/dist HEAD`:gh-pages --force
+          git push origin `git subtree split --prefix dist HEAD`:gh-pages --force

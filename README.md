@@ -1,5 +1,5 @@
 <div align=center>
-  <img src="frontend/src/assets/images/logo.png" alt="Logo of Reflejos del lago" width="400">
+  <img src="src/assets/images/logo.png" alt="Logo of Reflejos del lago" width="400">
 </div>
 
 <div align=center>
