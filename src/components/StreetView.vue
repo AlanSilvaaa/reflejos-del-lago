@@ -2,7 +2,14 @@
 /* global google */
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import StreetViewMiniMap from '@/components/StreetViewMiniMap.vue'
-import ProvinciaDeLlanquihue from '@/data/boundaries/ProvinciaDeLlanquihue.json'
+import {
+  PROVINCE_MINIMAP_CENTER,
+  PROVINCE_MIN_ZOOM,
+  applyProvinceMapRestriction,
+  drawProvinceBoundaryMask,
+  isWithinProvinceBoundary,
+  provinceOutline,
+} from '@/helpers/provinceMap'
 
 const props = defineProps({
   gamemode: {
@@ -15,22 +22,14 @@ const props = defineProps({
   },
 })
 
-const ProvinciaDeLlanquihueOutline = ProvinciaDeLlanquihue.map((ring) => ({
-  paths: ring,
-  strokeColor: '#FF0000',
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: '#FF0000',
-  fillOpacity: 0,
-  clickable: false
-}))
-
 const emits = defineEmits(['guessClick'])
 const clickedPosition = ref(null)
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-const centerMinimap = { lat: -41.333333333333, lng: -72.833333333333 }
+const centerMinimap = PROVINCE_MINIMAP_CENTER
+const MINIMAP_ZOOM = PROVINCE_MIN_ZOOM
 const mapInstance = ref(null)
 const marker = ref(null)
+const boundaryMask = ref(null)
 const googleMapComponent = ref(null)
 const panoramaInstance = ref(null)
 const streetViewElement = ref(null)
@@ -65,6 +64,14 @@ function buildPanoramaOptions(coord) {
   }
 
   return panoramaOptions
+}
+
+function applyMinimapRestriction(map) {
+  applyProvinceMapRestriction(map, MINIMAP_ZOOM)
+}
+
+function drawBoundaryMask(map) {
+  boundaryMask.value = drawProvinceBoundaryMask(map, boundaryMask.value)
 }
 
 function initializePanorama(coord, element) {
@@ -130,9 +137,17 @@ onMounted(() => {
     if (map) {
       clearInterval(checkMap)
       mapInstance.value = map
+      applyMinimapRestriction(map)
+      drawBoundaryMask(map)
 
       map.addListener('click', (event) => {
-        clickedPosition.value = event.latLng.toJSON()
+        const nextPosition = event.latLng.toJSON()
+
+        if (!isWithinProvinceBoundary(nextPosition)) {
+          return
+        }
+
+        clickedPosition.value = nextPosition
 
         if (marker.value) {
           marker.value.setMap(null)
@@ -150,6 +165,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(panoramaRetryInterval)
   window.removeEventListener('keydown', handleKeydown)
+  boundaryMask.value?.setMap(null)
 })
 
 </script>
@@ -161,7 +177,7 @@ onBeforeUnmount(() => {
       v-model:google-map-component="googleMapComponent"
       :api-key="apiKey"
       :center="centerMinimap"
-      :outline="ProvinciaDeLlanquihueOutline"
+      :outline="provinceOutline"
       @submit-guess="submitGuess"
     />
   </div>

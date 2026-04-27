@@ -1,7 +1,11 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { GoogleMap, AdvancedMarker, Polyline, Polygon } from 'vue3-google-map'
-import ProvinciaDeLlanquihue from '@/data/boundaries/ProvinciaDeLlanquihue.json'
+import {
+  applyProvinceMapRestriction,
+  drawProvinceBoundaryMask,
+  provinceOutline,
+} from '@/helpers/provinceMap'
 
 const props = defineProps({
   guessCoord: {
@@ -14,19 +18,10 @@ const props = defineProps({
   },
 })
 
-const ProvinciaDeLlanquihueOutline = ProvinciaDeLlanquihue.map((ring) => ({
-  paths: ring,
-  strokeColor: '#FF0000',
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: '#FF0000',
-  fillOpacity: 0,
-  clickable: false
-}))
-
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const mapId = import.meta.env.VITE_GOOGLE_MAP_ID
 const googleMapComponent = ref(null)
+const boundaryMask = ref(null)
 let mapReadyInterval = null
 
 const mapCenter = computed(() => ({
@@ -67,6 +62,7 @@ function fitMapToMarkers() {
   bounds.extend(props.guessCoord)
   bounds.extend(props.realCoord)
   map.fitBounds(bounds, 80)
+  applyProvinceMapRestriction(map)
 }
 
 onMounted(() => {
@@ -77,6 +73,7 @@ onMounted(() => {
 
     window.clearInterval(mapReadyInterval)
     mapReadyInterval = null
+    boundaryMask.value = drawProvinceBoundaryMask(googleMapComponent.value.map, boundaryMask.value)
     fitMapToMarkers()
   }, 200)
 })
@@ -85,6 +82,8 @@ onBeforeUnmount(() => {
   if (mapReadyInterval) {
     window.clearInterval(mapReadyInterval)
   }
+
+  boundaryMask.value?.setMap(null)
 })
 </script>
 
@@ -97,7 +96,7 @@ onBeforeUnmount(() => {
       <AdvancedMarker :options="{ position: realCoord }"
         :pin-options="{ background: '#2bf060', borderColor: '#000000', glyphText: '✅' }" />
       <Polyline :options="lineProperties" />
-      <Polygon v-for="(opts, idx) in ProvinciaDeLlanquihueOutline" :key="idx" :options="opts" />
+      <Polygon v-for="(opts, idx) in provinceOutline" :key="idx" :options="opts" />
     </GoogleMap>
   </div>
 </template>
