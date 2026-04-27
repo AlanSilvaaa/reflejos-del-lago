@@ -1,7 +1,10 @@
 <script setup>
-import { computed, ref } from 'vue'
+import confetti from 'canvas-confetti'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import GMaps from '@/components/GMaps.vue'
 import ResultsSummaryPanel from '@/components/ResultsSummaryPanel.vue'
+
+const CONFETTI_SCORE_THRESHOLD = 4500
 
 const props = defineProps({
   guessCoord: {
@@ -41,6 +44,7 @@ const props = defineProps({
 const emit = defineEmits(['nextRound', 'playAgain', 'backToMenu'])
 
 const showFinalResults = ref(false)
+const confettiTimeoutIds = []
 
 const displayRoundDistance = computed(() => {
   return `${props.roundDistance.toFixed(2)} metros`
@@ -52,6 +56,47 @@ const formattedTotalDistance = computed(() => {
   }
 
   return `${props.accumulatedDistance.toFixed(2)} metros`
+})
+
+/**
+ * Launch confetti from both sides of the screen with a delay between bursts when the player achieves a score above the CONFETTI_SCORE_THRESHOLD.
+ */
+function launchSideConfetti() {
+  const bursts = [0, 180, 360]
+
+  bursts.forEach((delay) => {
+    const timeoutId = window.setTimeout(() => {
+      confetti({
+        particleCount: 70,
+        angle: 60,
+        spread: 55,
+        startVelocity: 45,
+        origin: { x: 0, y: 0.7 },
+      })
+
+      confetti({
+        particleCount: 70,
+        angle: 120,
+        spread: 55,
+        startVelocity: 45,
+        origin: { x: 1, y: 0.7 },
+      })
+    }, delay)
+
+    confettiTimeoutIds.push(timeoutId)
+  })
+}
+
+onMounted(() => {
+  if (props.roundScore < CONFETTI_SCORE_THRESHOLD) {
+    return
+  }
+
+  launchSideConfetti()
+})
+
+onBeforeUnmount(() => {
+  confettiTimeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId))
 })
 </script>
 

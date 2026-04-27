@@ -24,22 +24,24 @@ defineEmits(['submitGuess'])
 
 <template>
   <div
-    class="absolute bottom-0 right-0 z-10 h-[250px] w-[30%] opacity-50 transition-all duration-300 hover:h-[300px] hover:w-[40%] hover:opacity-100"
+    class="absolute bottom-4 right-4 z-10 flex w-[250px] flex-col gap-3 opacity-50 transition-all duration-300 hover:w-[320px] hover:opacity-100"
   >
-    <GoogleMap
-      ref="googleMapComponent"
-      :api-key="apiKey"
-      :libraries="['places', 'marker']"
-      style="height: 300px;"
-      :center="center"
-      :zoom="7"
-      :disable-default-ui="true"
-    >
-      <Polygon v-for="(opts, idx) in outline" :key="idx" :options="opts" />
-    </GoogleMap>
+    <div class="aspect-square overflow-hidden rounded-md">
+      <GoogleMap
+        ref="googleMapComponent"
+        :api-key="apiKey"
+        :libraries="['places', 'marker']"
+        style="width: 100%; height: 100%"
+        :center="center"
+        :zoom="7"
+        :disable-default-ui="true"
+      >
+        <Polygon v-for="(opts, idx) in outline" :key="idx" :options="opts" />
+      </GoogleMap>
+    </div>
 
-    <div class="absolute bottom-2 left-1/2 z-50 -translate-x-1/2 transform">
-      <Button severity="success" raised class="text-sm px-4 py-2" @click="$emit('submitGuess')">
+    <div class="w-full">
+      <Button severity="success" raised class="w-full text-sm px-4 py-2" @click="$emit('submitGuess')">
         Adivinar
       </Button>
     </div>

@@ -99,15 +99,32 @@ function initializePanorama(coord, element) {
 
 function submitGuess() {
   if (!clickedPosition.value) {
-    alert('Debes hacer clic en el mapa.')
+    console.log('Debes hacer clic en el mapa.')
     return
   }
 
   emits('guessClick', clickedPosition.value)
 }
 
+function handleKeydown(event) {
+  const target = event.target
+  const isEditableTarget =
+    target instanceof HTMLElement
+    && (target.isContentEditable
+      || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(target.tagName))
+
+  if (event.code !== 'Space' || isEditableTarget) {
+    return
+  }
+
+  event.preventDefault()
+  submitGuess()
+}
+
 
 onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+
   const checkMap = setInterval(() => {
     const map = googleMapComponent.value?.map
     if (map) {
@@ -132,6 +149,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   clearInterval(panoramaRetryInterval)
+  window.removeEventListener('keydown', handleKeydown)
 })
 
 </script>
