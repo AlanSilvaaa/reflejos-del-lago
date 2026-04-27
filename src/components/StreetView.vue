@@ -9,7 +9,7 @@ import {
   drawProvinceBoundaryMask,
   isWithinProvinceBoundary,
   provinceOutline,
-} from '@/helpers/provinceMap'
+} from '@/helpers/provinceMap.ts'
 
 const props = defineProps({
   gamemode: {

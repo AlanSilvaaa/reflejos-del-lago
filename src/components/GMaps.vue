@@ -5,7 +5,7 @@ import {
   applyProvinceMapRestriction,
   drawProvinceBoundaryMask,
   provinceOutline,
-} from '@/helpers/provinceMap'
+} from '@/helpers/provinceMap.ts'
 
 const props = defineProps({
   guessCoord: {
