@@ -37,9 +37,19 @@ const mapCenter = computed(() => ({
 const lineProperties = computed(() => ({
   path: [props.guessCoord, props.realCoord],
   geodesic: true,
-  strokeColor: '#FF0000',
-  strokeOpacity: 1.0,
-  strokeWeight: 2,
+  strokeOpacity: 0,
+  icons: [
+    {
+      icon: {
+        path: 'M 0,-1 0,1',
+        strokeColor: '#000000',
+        strokeOpacity: 1,
+        scale: 3,
+      },
+      offset: '0',
+      repeat: '12px',
+    },
+  ],
 }))
 
 watch([() => props.guessCoord, () => props.realCoord], fitMapToMarkers, { deep: true })
