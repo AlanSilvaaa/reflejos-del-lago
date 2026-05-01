@@ -1,17 +1,17 @@
 <template>
   <div :style="gameModesStyle">
-    <div :style="cardsStageStyle" :class="{ 'pointer-events-none': isFlipping }">
+    <div :style="cardsStageStyle">
       <div @click="handleCardClick(0)" class="inline-flex absolute cursor-pointer" style="transform-style: preserve-3d;"
         ref="no_movement_mode">
-        <Polaroid :data="noMovementModeText" @playGame="PlayGame"/>
+        <Polaroid :data="noMovementModeText" :is-flipping="isFlipping" @playGame="PlayGame"/>
       </div>
       <div @click="handleCardClick(1)" class="inline-flex absolute cursor-pointer" style="transform-style: preserve-3d;"
         ref="normal_mode">
-        <Polaroid :data="normalModeText" @playGame="PlayGame"/>
+        <Polaroid :data="normalModeText" :is-flipping="isFlipping" @playGame="PlayGame"/>
       </div>
       <div @click="handleCardClick(2)" class="inline-flex absolute cursor-pointer" style="transform-style: preserve-3d;"
         ref="infinite_mode">
-        <Polaroid :data="customModeText" @playGame="PlayGame"/>
+        <Polaroid :data="customModeText" :is-flipping="isFlipping" @playGame="PlayGame"/>
       </div>
     </div>
   </div>

@@ -20,7 +20,7 @@
           {{ index + 1 }}. {{ rule }}
         </li>
       </ul>
-      <Button @click="handlePlayGame">Jugar</Button>
+      <Button :disabled="isFlipping" @click.stop="handlePlayGame">Jugar</Button>
     </div>
   </div>
 </template>
@@ -32,7 +32,16 @@ import hover_card from "../assets/sounds/hover_card.wav";
 import gsap from "gsap";
 import { Button } from 'primevue';
 
-const props = defineProps(["data"]);
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true,
+  },
+  isFlipping: {
+    type: Boolean,
+    default: false,
+  },
+});
 const front = ref(props.data.front);
 const back = ref(props.data.back);
 const card = ref(null);
@@ -42,6 +51,10 @@ const { play: hoverCardSound } = useSound(hover_card, { volume: 0.5 });
 
 
 function handlePlayGame() {
+  if (props.isFlipping) {
+    return;
+  }
+
   emit("playGame", front.value.title);
 }
 
