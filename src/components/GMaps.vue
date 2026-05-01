@@ -91,10 +91,16 @@ onBeforeUnmount(() => {
   <div class="relative z-0">
     <GoogleMap ref="googleMapComponent" :api-key="apiKey" :map-id="mapId" style="width: 100%; height: 100vh" :libraries="['places', 'marker']"
       :center="mapCenter" :zoom="8" :disable-default-ui="true">
-      <AdvancedMarker :options="{ position: guessCoord }"
-        :pin-options="{ background: '#2b4cf0', borderColor: '#000000', glyphText: '📍' }" />
-      <AdvancedMarker :options="{ position: realCoord }"
-        :pin-options="{ background: '#2bf060', borderColor: '#000000', glyphText: '✅' }" />
+      <AdvancedMarker :options="{ position: guessCoord }">
+        <div class="relative flex h-12 w-12 items-center justify-center rounded-[50%_50%_50%_0] border-2 border-black bg-[#2b4cf0] text-white shadow-lg [transform:rotate(-45deg)]">
+          <i class="pi pi-map-marker text-base [transform:rotate(45deg)]" />
+        </div>
+      </AdvancedMarker>
+      <AdvancedMarker :options="{ position: realCoord }">
+        <div class="relative flex h-12 w-12 items-center justify-center rounded-[50%_50%_50%_0] border-2 border-black bg-[#2bf060] text-black shadow-lg [transform:rotate(-45deg)]">
+          <i class="pi pi-check text-base [transform:rotate(45deg)]" />
+        </div>
+      </AdvancedMarker>
       <Polyline :options="lineProperties" />
       <Polygon v-for="(opts, idx) in provinceOutline" :key="idx" :options="opts" />
     </GoogleMap>

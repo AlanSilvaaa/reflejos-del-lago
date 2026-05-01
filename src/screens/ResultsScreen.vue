@@ -245,8 +245,14 @@ onBeforeUnmount(() => {
                 root: { class: 'border border-white/10 bg-slate-900/90 text-slate-200' },
                 label: { class: 'text-[0.72rem] font-medium' },
               }"
-              value="📍 Tu marca"
-            />
+            >
+              <template #default>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-map-marker text-[0.72rem]" />
+                  <span>Tu marca</span>
+                </div>
+              </template>
+            </Tag>
             <Tag
               rounded
               severity="secondary"
@@ -254,8 +260,14 @@ onBeforeUnmount(() => {
                 root: { class: 'border border-white/10 bg-slate-900/90 text-slate-200' },
                 label: { class: 'text-[0.72rem] font-medium' },
               }"
-              value="✅ Punto real"
-            />
+            >
+              <template #default>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-check text-[0.72rem]" />
+                  <span>Punto real</span>
+                </div>
+              </template>
+            </Tag>
             <Tag
               rounded
               severity="secondary"

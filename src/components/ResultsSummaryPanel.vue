@@ -61,8 +61,8 @@ const finalCardPt = {
     <Card :pt="resultCardPt">
       <template #title>Leyenda</template>
       <template #content>
-        <p class="m-0">Coordenada original: ✅</p>
-        <p class="m-0">Tu respuesta: 📍</p>
+        <p class="m-0 flex items-center gap-2"><i class="pi pi-check" /> <span>Coordenada original</span></p>
+        <p class="m-0 flex items-center gap-2"><i class="pi pi-map-marker" /> <span>Tu respuesta</span></p>
       </template>
     </Card>
 
