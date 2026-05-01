@@ -11,3 +11,7 @@ This app is based on the popular game Geoguessr, where players are placed in a r
 - The database is located on a single file called reflejos.sqlite3, and it uses sqlite3 to query the data.
 - It uses `pnpm` as the package manager. Ensure to always use `pnpm` commands for installing dependencies and running scripts.
 - This project uses typescript, not javascript, so if you need to write a file that is not a .vue file, make sure to use the .ts extension and follow typescript syntax.
+
+## Instructions
+
+- When commiting files, use the `conventional commits` convention. Use the following format for commit messages: `<type>(<scope>): <description>`. For example: `feat(game): add new game mode`.
