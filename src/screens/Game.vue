@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
+import { RANDOM_NODE_DIFFICULTY_DISTRIBUTION, RANDOM_NODE_DIFFICULTY_ORDER } from '@/config'
 import PlayGame from '@/screens/PlayGame.vue'
 import ResultsScreen from '@/screens/ResultsScreen.vue'
 import haversineDistance from '@/helpers/haversineDistance.ts'
@@ -24,6 +25,21 @@ const MAX_SCORE = 5000
 const SCORE_THRESHOLD = 50
 const SCORE_DECAY = 0.0005
 const SESSION_STORAGE_KEY = 'game-session'
+
+function getRandomDifficulty() {
+  const randomValue = Math.random()
+  let cumulativeProbability = 0
+
+  for (const difficulty of RANDOM_NODE_DIFFICULTY_ORDER) {
+    cumulativeProbability += RANDOM_NODE_DIFFICULTY_DISTRIBUTION[difficulty]
+
+    if (randomValue < cumulativeProbability) {
+      return difficulty
+    }
+  }
+
+  return RANDOM_NODE_DIFFICULTY_ORDER[RANDOM_NODE_DIFFICULTY_ORDER.length - 1]
+}
 
 const gamemode = ref(DEFAULT_GAMEMODE)
 const customSettings = ref({ ...DEFAULT_CUSTOM_GAME_SETTINGS })
@@ -297,12 +313,13 @@ function stopRoundTimer() {
 
 async function loadRound() {
   try {
+    const randomDifficulty = getRandomDifficulty()
     const coord = isCustomMode.value
       ? await getFilteredRandomNode(usedNodeIds.value, {
         municipalities: customSettings.value.municipalities,
         difficulty: customSettings.value.difficulty,
       })
-      : await getRandomNode(usedNodeIds.value)
+      : await getRandomNode(usedNodeIds.value, randomDifficulty)
 
     realCoord.value = { lat: coord.lat, lng: coord.lng }
     initialCoord.value = { lat: coord.lat, lng: coord.lng }

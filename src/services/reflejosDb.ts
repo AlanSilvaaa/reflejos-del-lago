@@ -151,9 +151,14 @@ function readRandomNode(
   }
 }
 
-export async function getRandomNode(usedNodeIds: number[] = []) {
+export async function getRandomNode(
+  usedNodeIds: number[] = [],
+  difficulty?: DifficultyLevel,
+) {
   const db = await getDatabase();
-  const node = readRandomNode(db, usedNodeIds) || readRandomNode(db);
+  const node =
+    readRandomNode(db, usedNodeIds, { difficulty }) ||
+    readRandomNode(db, [], { difficulty });
 
   if (!node) {
     throw new Error("No hay nodos disponibles en la base de datos local");

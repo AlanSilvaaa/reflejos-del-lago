@@ -1,9 +1,6 @@
 import haversineDistance from "../helpers/haversineDistance.ts";
+import { NODE_DIFFICULTY_DISTANCE_THRESHOLDS } from "../config.ts";
 import { getDatabase, persistDatabase } from "../services/reflejosDb.ts";
-
-const EASY = 1000;
-const NORMAL = 5000;
-// HARD is any distance greater than NORMAl
 
 type Difficulty = "EASY" | "NORMAL" | "HARD";
 
@@ -24,8 +21,8 @@ function getDifficulty(
     "meters",
   );
 
-  if (distance <= EASY) return "EASY";
-  if (distance <= NORMAL) return "NORMAL";
+  if (distance <= NODE_DIFFICULTY_DISTANCE_THRESHOLDS.EASY) return "EASY";
+  if (distance <= NODE_DIFFICULTY_DISTANCE_THRESHOLDS.NORMAL) return "NORMAL";
   return "HARD";
 }
 
@@ -58,10 +55,7 @@ function ensureDifficultyColumnExists(db: any) {
 /**
  * Assigns the difficulty level to each node on the database based on the distance from that node to the center of the municipality.
  *
- * The difficulty can be EASY, NORMAL or HARD, and the distance thresholds are defined as follows:
- * - EASY: distance <= 1000 meters
- * - NORMAL: 1000 meters < distance <= 5000 meters
- * - HARD: any distance over NORMAL
+ * The thresholds live in src/config.ts so the app and scripts use the same difficulty rules.
  */
 async function applyDifficultyToNodes() {
   const difficultyFrequency: Record<Difficulty, number> = {
