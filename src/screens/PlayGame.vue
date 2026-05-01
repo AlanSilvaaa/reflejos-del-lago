@@ -52,15 +52,18 @@ function returnToStart() {
 
 <template>
   <div class="relative h-screen w-full">
-    <StreetView :gamemode="gamemode" :real-coord="realCoord" @guess-click="handleGuessClick" />
-
-    <GameControls
-      :can-return-to-start="gamemode !== 'Sin movimiento'"
-      @back-to-menu="backToMenu"
+    <StreetView
+      :gamemode="gamemode"
+      :round="round"
+      :score="score"
+      :real-coord="realCoord"
+      @guess-click="handleGuessClick"
       @return-to-start="returnToStart"
     />
 
-    <GameStatusBar :round="round" :score="score" :countdown="countdown" />
+    <GameControls @back-to-menu="backToMenu" />
+
+    <GameStatusBar :countdown="countdown" :total-seconds="180" />
 
     <TimeExpiredOverlay
       :visible="timeExpired"

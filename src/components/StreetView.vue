@@ -16,13 +16,21 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  round: {
+    type: Number,
+    required: true,
+  },
+  score: {
+    type: Number,
+    required: true,
+  },
   realCoord: {
     type: Object,
     required: true,
   },
 })
 
-const emits = defineEmits(['guessClick'])
+const emits = defineEmits(['guessClick', 'returnToStart'])
 const clickedPosition = ref(null)
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const centerMinimap = PROVINCE_MINIMAP_CENTER
@@ -178,7 +186,11 @@ onBeforeUnmount(() => {
       :api-key="apiKey"
       :center="centerMinimap"
       :outline="provinceOutline"
+      :round="round"
+      :score="score"
+      :can-return-to-start="gamemode !== 'Sin movimiento'"
       @submit-guess="submitGuess"
+      @return-to-start="$emit('returnToStart')"
     />
   </div>
 
