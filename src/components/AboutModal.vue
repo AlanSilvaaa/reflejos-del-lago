@@ -12,7 +12,7 @@
                 <Card style="width: 25rem; overflow: hidden">
                     <template #header>
                         <div class="h-96 w-96">
-                            <ProvinceOfLlanquihue></ProvinceOfLlanquihue>
+                            <ProvinceOfLlanquihue :initial-zoom="7"></ProvinceOfLlanquihue>
                         </div>
                     </template>
                 </Card>

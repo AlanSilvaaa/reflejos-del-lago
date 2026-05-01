@@ -9,6 +9,10 @@ const props = defineProps({
     type: Array as () => string[],
     default: () => [],
   },
+  initialZoom: {
+    type: Number,
+    default: 8,
+  },
   selectable: {
     type: Boolean,
     default: false,
@@ -60,7 +64,7 @@ const polygonGroups = computed(() => {
         strokeWeight,
         fillColor,
         fillOpacity,
-        clickable: props.selectable,
+        clickable: true,
       })),
     }
   })
@@ -96,7 +100,7 @@ function handleToggleMunicipality(name: string) {
       :libraries="['places', 'marker']"
       :disable-default-ui="true"
       :center="LLANQUIHUE_CENTER"
-      :zoom="8"
+      :zoom="initialZoom"
       :options="{
         draggable: false,
         scrollwheel: false,
