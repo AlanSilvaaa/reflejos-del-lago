@@ -94,7 +94,7 @@ defineEmits(['submitGuess', 'returnToStart'])
     </div>
 
     <div class="w-full">
-      <Button severity="success" raised class="w-full text-sm px-4 py-2" @click="$emit('submitGuess')">
+      <Button raised class="w-full text-sm px-4 py-2" @click="$emit('submitGuess')">
         Adivinar
       </Button>
     </div>

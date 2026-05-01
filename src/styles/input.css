@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .rdl-button-primary {
+    @apply border-0 bg-sky-400 text-sky-950 shadow-none transition-colors duration-200 hover:bg-sky-300 disabled:opacity-50 disabled:hover:bg-sky-400;
+  }
+
+  .rdl-button-secondary {
+    @apply border-0 bg-white/10 text-white shadow-none transition-colors duration-200 hover:bg-white/15;
+  }
+}
+
 @font-face {
   font-family: 'Minecraft';
   src: url('../assets/fonts/Minecraft.ttf') format('truetype');

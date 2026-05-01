@@ -274,7 +274,7 @@ onBeforeUnmount(() => {
             rounded
             class="w-full"
             :pt="{
-              root: { class: 'border-0 bg-emerald-400 text-slate-950 shadow-none hover:bg-emerald-300' },
+              root: { class: 'rdl-button-primary' },
               label: { class: 'font-semibold' },
             }"
             @click="handlePrimaryAction"
@@ -319,7 +319,7 @@ onBeforeUnmount(() => {
             rounded
             class="flex-1"
             :pt="{
-              root: { class: 'border-0 bg-emerald-400 text-slate-950 shadow-none hover:bg-emerald-300' },
+              root: { class: 'rdl-button-primary' },
               label: { class: 'font-semibold' },
             }"
             @click="emit('playAgain')"
@@ -330,7 +330,7 @@ onBeforeUnmount(() => {
             severity="secondary"
             class="flex-1"
             :pt="{
-              root: { class: 'border-0 bg-white/10 text-white shadow-none hover:bg-white/15' },
+              root: { class: 'rdl-button-secondary' },
               label: { class: 'font-semibold' },
             }"
             @click="emit('backToMenu')"

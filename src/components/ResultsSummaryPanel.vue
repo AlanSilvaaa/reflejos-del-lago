@@ -71,12 +71,20 @@ const finalCardPt = {
         v-if="!isLastRound"
         label="Siguiente Ronda"
         raised
+        :pt="{
+          root: { class: 'rdl-button-primary' },
+          label: { class: 'font-semibold' },
+        }"
         @click="$emit('nextRound')"
       />
       <Button
         v-else
         label="Ver Resultados"
         raised
+        :pt="{
+          root: { class: 'rdl-button-primary' },
+          label: { class: 'font-semibold' },
+        }"
         @click="$emit('showFinalResults')"
       />
     </div>
@@ -93,8 +101,24 @@ const finalCardPt = {
         <p>Puntaje total: {{ totalScore }}</p>
         <p>Resultados calculados localmente en esta sesion.</p>
         <div>
-          <Button label="Volver a jugar" style="margin-top: 1rem; width: 100%;" @click="$emit('playAgain')" />
-          <Button label="Volver al menú" style="margin-top: 1rem; width: 100%;" @click="$emit('backToMenu')" />
+          <Button
+            label="Volver a jugar"
+            style="margin-top: 1rem; width: 100%;"
+            :pt="{
+              root: { class: 'rdl-button-primary' },
+              label: { class: 'font-semibold' },
+            }"
+            @click="$emit('playAgain')"
+          />
+          <Button
+            label="Volver al menú"
+            style="margin-top: 1rem; width: 100%;"
+            :pt="{
+              root: { class: 'rdl-button-secondary' },
+              label: { class: 'font-semibold' },
+            }"
+            @click="$emit('backToMenu')"
+          />
         </div>
       </template>
     </Card>

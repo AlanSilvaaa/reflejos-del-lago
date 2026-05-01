@@ -118,7 +118,7 @@
             class="flex-1"
             :disabled="selectedMunicipalities.length === 0"
             :pt="{
-              root: { class: 'border-0 bg-emerald-400 text-slate-950 shadow-none hover:bg-emerald-300 disabled:opacity-50' },
+              root: { class: 'rdl-button-primary' },
               label: { class: 'font-semibold' },
             }"
             @click="startGame"

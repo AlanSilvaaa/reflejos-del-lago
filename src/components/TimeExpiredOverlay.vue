@@ -18,7 +18,22 @@ defineEmits(['playAgain', 'backToMenu'])
   >
     <div class="mb-5 text-2xl font-bold">¡Se acabó el tiempo!</div>
     <div class="mb-8 text-lg">Has perdido esta ronda.</div>
-    <Button label="Volver a jugar" class="mb-2" @click="$emit('playAgain')" />
-    <Button label="Volver al menú" @click="$emit('backToMenu')" />
+    <Button
+      label="Volver a jugar"
+      class="mb-2"
+      :pt="{
+        root: { class: 'rdl-button-primary' },
+        label: { class: 'font-semibold' },
+      }"
+      @click="$emit('playAgain')"
+    />
+    <Button
+      label="Volver al menú"
+      :pt="{
+        root: { class: 'rdl-button-secondary' },
+        label: { class: 'font-semibold' },
+      }"
+      @click="$emit('backToMenu')"
+    />
   </div>
 </template>
