@@ -28,15 +28,15 @@ export const noMovementModeText = {
     },
 }
 
-export const infiniteModeText = {
+export const customModeText = {
     front: {
         img: infiniteModeImage,
-        title: "Modo infinito",
-        highscore: "3500 pts.",
+        title: "Modo personalizado",
+        highscore: "configurable",
     },
     back: {
-        title: "Modo inifinito",
-        description: "Ve cuantas imágenes puedes reconocer",
-        rules: ["3 minutos por ronda", "rondas infinitas", "Puedes mover la cámara", "Puedes moverte"],
+        title: "Modo personalizado",
+        description: "Construye una partida a tu medida",
+        rules: ["Rondas configurables", "Tiempo ajustable", "Filtra por comunas", "Elige dificultad y movimiento"],
     },
 }

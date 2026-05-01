@@ -5,7 +5,13 @@ import { useRoute, useRouter } from 'vue-router'
 import PlayGame from '@/screens/PlayGame.vue'
 import ResultsScreen from '@/screens/ResultsScreen.vue'
 import haversineDistance from '@/helpers/haversineDistance.ts'
-import { getRandomNode } from '@/services/reflejosDb'
+import { getFilteredRandomNode, getRandomNode } from '@/services/reflejosDb'
+import {
+  CUSTOM_GAME_SETTINGS_STORAGE_KEY,
+  CUSTOM_GAMEMODE_NAME,
+  DEFAULT_CUSTOM_GAME_SETTINGS,
+  normalizeCustomGameSettings,
+} from '@/types/customGame'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,12 +19,14 @@ const toast = useToast()
 
 const DEFAULT_GAMEMODE = 'Modo normal'
 const MAX_ROUNDS = 3
+const DEFAULT_ROUND_DURATION = 180
 const MAX_SCORE = 5000
 const SCORE_THRESHOLD = 50
 const SCORE_DECAY = 0.0005
 const SESSION_STORAGE_KEY = 'game-session'
 
 const gamemode = ref(DEFAULT_GAMEMODE)
+const customSettings = ref({ ...DEFAULT_CUSTOM_GAME_SETTINGS })
 const round = ref(1)
 const usedNodeIds = ref([])
 const initialCoord = ref(null)
@@ -27,7 +35,7 @@ const guessCoord = ref(null)
 const score = ref(0)
 const meters = ref(0)
 const showResults = ref(false)
-const countdown = ref(180)
+const countdown = ref(DEFAULT_ROUND_DURATION)
 const timeExpired = ref(false)
 const roundDeadline = ref(null)
 let countdownInterval = null
@@ -57,7 +65,17 @@ const roundScore = computed(() => {
 const totalScore = computed(() => score.value + roundScore.value)
 const accumulatedDistance = computed(() => meters.value + roundDistance.value)
 const isInfiniteMode = computed(() => gamemode.value === 'Modo infinito')
-const isLastRound = computed(() => !isInfiniteMode.value && round.value >= MAX_ROUNDS)
+const isCustomMode = computed(() => gamemode.value === CUSTOM_GAMEMODE_NAME)
+const roundLimit = computed(() => (isCustomMode.value ? customSettings.value.rounds : MAX_ROUNDS))
+const roundDuration = computed(() => (isCustomMode.value ? customSettings.value.timePerRound : DEFAULT_ROUND_DURATION))
+const isMovementDisabled = computed(() => {
+  if (isCustomMode.value) {
+    return customSettings.value.disableMovement
+  }
+
+  return gamemode.value === 'Sin movimiento'
+})
+const isLastRound = computed(() => !isInfiniteMode.value && round.value >= roundLimit.value)
 
 initializeGame()
 
@@ -69,15 +87,18 @@ watch(
     }
 
     const nextGamemode = resolveGamemode(queryGamemode)
+    const nextCustomSettings = nextGamemode === CUSTOM_GAMEMODE_NAME
+      ? loadStoredCustomSettings()
+      : { ...DEFAULT_CUSTOM_GAME_SETTINGS }
 
     if (nextGamemode !== gamemode.value) {
-      startNewGame(nextGamemode)
+      startNewGame(nextGamemode, nextCustomSettings)
     }
   },
 )
 
 watch(
-  [gamemode, round, usedNodeIds, initialCoord, realCoord, guessCoord, score, meters, showResults],
+  [gamemode, customSettings, round, usedNodeIds, initialCoord, realCoord, guessCoord, score, meters, showResults],
   persistSession,
   { deep: true },
 )
@@ -109,7 +130,31 @@ function initializeGame() {
     return
   }
 
-  startNewGame(queryGamemode)
+  const nextCustomSettings = queryGamemode === CUSTOM_GAMEMODE_NAME
+    ? loadStoredCustomSettings()
+    : { ...DEFAULT_CUSTOM_GAME_SETTINGS }
+
+  startNewGame(queryGamemode, nextCustomSettings)
+}
+
+function loadStoredCustomSettings() {
+  if (typeof window === 'undefined') {
+    return { ...DEFAULT_CUSTOM_GAME_SETTINGS }
+  }
+
+  try {
+    const rawSettings = window.sessionStorage.getItem(CUSTOM_GAME_SETTINGS_STORAGE_KEY)
+
+    if (!rawSettings) {
+      return { ...DEFAULT_CUSTOM_GAME_SETTINGS }
+    }
+
+    return normalizeCustomGameSettings(JSON.parse(rawSettings))
+  } catch (error) {
+    console.error('Failed to restore custom game settings', error)
+    window.sessionStorage.removeItem(CUSTOM_GAME_SETTINGS_STORAGE_KEY)
+    return { ...DEFAULT_CUSTOM_GAME_SETTINGS }
+  }
 }
 
 function restoreSession() {
@@ -128,6 +173,7 @@ function restoreSession() {
 
     const restoredSession = {
       gamemode: parsedSession.gamemode || DEFAULT_GAMEMODE,
+      customSettings: normalizeCustomGameSettings(parsedSession.customSettings),
       round: parsedSession.round || 1,
       usedNodeIds: Array.isArray(parsedSession.usedNodeIds) ? parsedSession.usedNodeIds : [],
       initialCoord: parsedSession.initialCoord || null,
@@ -136,12 +182,13 @@ function restoreSession() {
       score: parsedSession.score || 0,
       meters: parsedSession.meters || 0,
       showResults: Boolean(parsedSession.showResults),
-      countdown: parsedSession.countdown || 180,
+      countdown: parsedSession.countdown || DEFAULT_ROUND_DURATION,
       timeExpired: Boolean(parsedSession.timeExpired),
       roundDeadline: parsedSession.roundDeadline || null,
     }
 
     gamemode.value = restoredSession.gamemode
+    customSettings.value = restoredSession.customSettings
     round.value = restoredSession.round
     usedNodeIds.value = restoredSession.usedNodeIds
     initialCoord.value = restoredSession.initialCoord
@@ -171,6 +218,7 @@ function persistSession() {
     SESSION_STORAGE_KEY,
     JSON.stringify({
       gamemode: gamemode.value,
+      customSettings: customSettings.value,
       round: round.value,
       usedNodeIds: usedNodeIds.value,
       initialCoord: initialCoord.value,
@@ -220,7 +268,7 @@ function syncCountdown() {
   clearCountdownInterval()
 }
 
-function startRoundTimer(durationSeconds = 180) {
+function startRoundTimer(durationSeconds = roundDuration.value) {
   clearCountdownInterval()
   timeExpired.value = false
   countdown.value = durationSeconds
@@ -249,19 +297,27 @@ function stopRoundTimer() {
 
 async function loadRound() {
   try {
-    const coord = await getRandomNode(usedNodeIds.value)
+    const coord = isCustomMode.value
+      ? await getFilteredRandomNode(usedNodeIds.value, {
+        municipalities: customSettings.value.municipalities,
+        difficulty: customSettings.value.difficulty,
+      })
+      : await getRandomNode(usedNodeIds.value)
 
     realCoord.value = { lat: coord.lat, lng: coord.lng }
     initialCoord.value = { lat: coord.lat, lng: coord.lng }
     usedNodeIds.value = [...usedNodeIds.value, coord.id]
-    startRoundTimer()
+    startRoundTimer(roundDuration.value)
   } catch (error) {
     console.error('Fetch coordinates from local SQLite failed', error)
   }
 }
 
-async function startNewGame(nextGamemode = gamemode.value) {
+async function startNewGame(nextGamemode = gamemode.value, nextCustomSettings = customSettings.value) {
   gamemode.value = nextGamemode
+  customSettings.value = nextGamemode === CUSTOM_GAMEMODE_NAME
+    ? normalizeCustomGameSettings(nextCustomSettings)
+    : { ...DEFAULT_CUSTOM_GAME_SETTINGS }
   round.value = 1
   usedNodeIds.value = []
   initialCoord.value = null
@@ -270,7 +326,7 @@ async function startNewGame(nextGamemode = gamemode.value) {
   score.value = 0
   meters.value = 0
   showResults.value = false
-  countdown.value = 180
+  countdown.value = roundDuration.value
   timeExpired.value = false
   roundDeadline.value = null
   await loadRound()
@@ -321,6 +377,7 @@ onBeforeUnmount(() => {
     :gamemode="gamemode"
     :round="round"
     :score="score"
+    :disable-movement="isMovementDisabled"
     :countdown="countdown"
     :time-expired="timeExpired"
     :real-coord="realCoord"

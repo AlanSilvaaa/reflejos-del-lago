@@ -1,6 +1,6 @@
 <script setup>
 /* global google */
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import StreetViewMiniMap from '@/components/StreetViewMiniMap.vue'
 import {
   PROVINCE_MINIMAP_CENTER,
@@ -24,6 +24,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  disableMovement: {
+    type: Boolean,
+    default: false,
+  },
   realCoord: {
     type: Object,
     required: true,
@@ -42,6 +46,8 @@ const googleMapComponent = ref(null)
 const panoramaInstance = ref(null)
 const streetViewElement = ref(null)
 let panoramaRetryInterval = null
+
+const movementDisabled = computed(() => props.disableMovement || props.gamemode === 'Sin movimiento')
 
 watch(
   [() => props.realCoord, streetViewElement],
@@ -65,7 +71,7 @@ function buildPanoramaOptions(coord) {
     showRoadLabels: false,
   }
 
-  if (props.gamemode === 'Sin movimiento') {
+  if (movementDisabled.value) {
     panoramaOptions.clickToGo = false
     panoramaOptions.linksControl = false
     panoramaOptions.panControl = false
@@ -188,7 +194,7 @@ onBeforeUnmount(() => {
       :outline="provinceOutline"
       :round="round"
       :score="score"
-      :can-return-to-start="gamemode !== 'Sin movimiento'"
+      :can-return-to-start="!movementDisabled"
       @submit-guess="submitGuess"
       @return-to-start="$emit('returnToStart')"
     />

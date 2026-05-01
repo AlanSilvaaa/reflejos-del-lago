@@ -290,35 +290,30 @@ onBeforeUnmount(() => {
       :closable="false"
       :style="{ width: 'min(30rem, 92vw)' }"
       :pt="{
-        root: { class: 'overflow-hidden border border-white/10 bg-slate-950 text-white shadow-2xl' },
-        header: { class: 'bg-slate-950 text-white border-b border-white/8' },
-        content: { class: 'bg-slate-950 text-white' },
+        root: { class: 'overflow-hidden border-0 bg-transparent shadow-none' },
+        header: { class: 'hidden' },
+        content: { class: 'bg-transparent p-0 text-white' },
+        mask: { class: 'bg-black/45 backdrop-blur-[2px]' },
       }"
     >
-      <template #header>
+      <div class="p-6 text-white">
         <div>
           <p class="m-0 text-[0.7rem] font-medium uppercase tracking-[0.24em] text-slate-400">Sesion completada</p>
-          <h2 class="m-0 mt-1 text-xl font-semibold text-white">Resultados finales</h2>
+          <h2 class="m-0 mt-1 text-2xl font-semibold text-white">Resultados finales</h2>
         </div>
-      </template>
 
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-3">
-          <div class="rounded-2xl border border-white/8 bg-slate-900/80 p-4">
+        <div class="mt-6 grid grid-cols-2 gap-6">
+          <div>
             <p class="m-0 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-slate-400">Puntaje final</p>
-            <p class="m-0 mt-2 text-3xl font-bold tabular-nums text-white">{{ displayTotalScore }}</p>
+            <p class="m-0 mt-3 text-5xl font-bold tabular-nums text-white">{{ displayTotalScore }}</p>
           </div>
-          <div class="rounded-2xl border border-white/8 bg-slate-900/80 p-4">
+          <div>
             <p class="m-0 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-slate-400">Distancia total</p>
-            <p class="m-0 mt-2 text-lg font-semibold text-white">{{ formattedTotalDistance }}</p>
+            <p class="m-0 mt-3 text-2xl font-semibold text-white">{{ formattedTotalDistance }}</p>
           </div>
         </div>
 
-        <div class="rounded-2xl border border-white/8 bg-slate-900/80 p-4 text-sm leading-6 text-slate-300">
-          Resultados calculados localmente en esta sesion para mantener la partida ligera y directa.
-        </div>
-
-        <div class="flex gap-3">
+        <div class="mt-6 flex gap-3">
           <Button
             label="Volver a jugar"
             rounded
@@ -335,7 +330,7 @@ onBeforeUnmount(() => {
             severity="secondary"
             class="flex-1"
             :pt="{
-              root: { class: 'border border-white/10 bg-slate-900 text-white shadow-none hover:bg-slate-800' },
+              root: { class: 'border-0 bg-white/10 text-white shadow-none hover:bg-white/15' },
               label: { class: 'font-semibold' },
             }"
             @click="emit('backToMenu')"

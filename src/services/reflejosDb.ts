@@ -1,4 +1,5 @@
 import initSqlJs from "sql.js";
+import type { DifficultyLevel } from "@/types/customGame";
 
 let dbPromise: Promise<any> | undefined;
 const SQLITE_DB_VERSION = "2026-04-24-schema-rename";
@@ -60,15 +61,60 @@ export async function getDatabase() {
   return dbPromise;
 }
 
+interface NodeFilters {
+  municipalities?: string[];
+  difficulty?: DifficultyLevel | null;
+}
+
+function buildNodeWhereClause(
+  usedNodeIds: number[],
+  filters: NodeFilters = {},
+) {
+  const clauses: string[] = [];
+  const params: Array<number | string> = [];
+
+  if (usedNodeIds.length) {
+    clauses.push(
+      `geoguessr_node.id NOT IN (${usedNodeIds.map(() => "?").join(", ")})`,
+    );
+    params.push(...usedNodeIds);
+  }
+
+  if (filters.municipalities?.length) {
+    clauses.push(
+      `municipality.name IN (${filters.municipalities.map(() => "?").join(", ")})`,
+    );
+    params.push(...filters.municipalities);
+  }
+
+  if (filters.difficulty) {
+    clauses.push("geoguessr_node.difficulty = ?");
+    params.push(filters.difficulty);
+  }
+
+  return {
+    whereClause: clauses.length ? `WHERE ${clauses.join(" AND ")}` : "",
+    params,
+  };
+}
+
 /**
  * Reads one random node from the in-memory SQLite DB, excluding ids already used in the current game.
  */
-function readRandomNode(db: any, usedNodeIds: number[] = []) {
+function readRandomNode(
+  db: any,
+  usedNodeIds: number[] = [],
+  filters: NodeFilters = {},
+) {
   const validUsedNodeIds = usedNodeIds.filter((id) => Number.isInteger(id));
-  const placeholders = validUsedNodeIds.map(() => "?").join(", ");
-  const whereClause = validUsedNodeIds.length
-    ? `WHERE geoguessr_node.id NOT IN (${placeholders})`
-    : "";
+  const normalizedMunicipalities =
+    filters.municipalities?.filter(
+      (name) => typeof name === "string" && name.trim().length > 0,
+    ) ?? [];
+  const { whereClause, params } = buildNodeWhereClause(validUsedNodeIds, {
+    municipalities: normalizedMunicipalities,
+    difficulty: filters.difficulty ?? null,
+  });
   const statement = db.prepare(`
     SELECT geoguessr_node.id, municipality.name, geoguessr_node.latitude, geoguessr_node.longitude
     FROM geoguessr_node
@@ -79,8 +125,8 @@ function readRandomNode(db: any, usedNodeIds: number[] = []) {
   `);
 
   try {
-    if (validUsedNodeIds.length) {
-      statement.bind(validUsedNodeIds);
+    if (params.length) {
+      statement.bind(params);
     }
 
     if (!statement.step()) {
@@ -116,6 +162,45 @@ export async function getRandomNode(usedNodeIds: number[] = []) {
   return node;
 }
 
+export async function getFilteredRandomNode(
+  usedNodeIds: number[] = [],
+  filters: NodeFilters = {},
+) {
+  const db = await getDatabase();
+  const node =
+    readRandomNode(db, usedNodeIds, filters) || readRandomNode(db, [], filters);
+
+  if (!node) {
+    throw new Error(
+      "No hay nodos disponibles para la configuracion seleccionada",
+    );
+  }
+
+  return node;
+}
+
+export async function getMunicipalities() {
+  const db = await getDatabase();
+  const statement = db.prepare(`
+    SELECT name
+    FROM municipality
+    ORDER BY name ASC
+  `);
+
+  try {
+    const municipalities: string[] = [];
+
+    while (statement.step()) {
+      const row = statement.getAsObject() as { name: string };
+      municipalities.push(row.name);
+    }
+
+    return municipalities;
+  } finally {
+    statement.free();
+  }
+}
+
 export async function persistDatabase(db: any) {
   if (isBrowserEnvironment()) {
     throw new Error("persistDatabase can only be used in Node");
@@ -129,7 +214,10 @@ export async function persistDatabase(db: any) {
 
   const currentFile = fileURLToPath(import.meta.url);
   const currentDir = path.dirname(currentFile);
-  const databaseFilePath = path.resolve(currentDir, "../../public/reflejos.sqlite3");
+  const databaseFilePath = path.resolve(
+    currentDir,
+    "../../public/reflejos.sqlite3",
+  );
   const exportedDatabase = db.export();
 
   await writeFile(databaseFilePath, exportedDatabase);

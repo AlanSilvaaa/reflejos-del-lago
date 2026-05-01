@@ -22,7 +22,7 @@
                 <p class="mt-4 text-white font-minecraft">
                     ¿Qué tanto conoces a la provincia de Llanquihue?
                 </p>
-                <GameModes class="mt-7" />
+                <GameModes class="mt-7" @play-game="playGame" @open-custom-mode="showCustomModeModal = true" />
             </div>
         </div>
         <p class="absolute bottom-3 left-1/2 z-10 m-0 -translate-x-1/2 text-center text-xs text-slate-200">
@@ -48,19 +48,26 @@
     </div>
 
     <AboutModal v-model:visible="showInfoModal" />
+    <CustomModeModal v-model:visible="showCustomModeModal" @start="startCustomGame" />
 
 </template>
 
 <script setup>
 import GameModes from '@/components/GameModes.vue';
 import Button from 'primevue/button';
+import { useRouter } from 'vue-router';
 import { defineAsyncComponent } from 'vue';
 import { ref, onMounted, nextTick  } from 'vue';
 import AboutModal from '@/components/AboutModal.vue';
+import CustomModeModal from '@/components/CustomModeModal.vue';
+import { CUSTOM_GAME_SETTINGS_STORAGE_KEY, CUSTOM_GAMEMODE_NAME } from '@/types/customGame';
 
 const ThreeSixtyView = defineAsyncComponent(() => import('../components/ThreeSixtyView.vue'));
+const router = useRouter();
+const GAME_SESSION_STORAGE_KEY = 'game-session';
 const show360 = ref(false);
 const showInfoModal = ref(false);
+const showCustomModeModal = ref(false);
 const threeSixtyStyle = {
     position: 'absolute',
     inset: '0',
@@ -91,6 +98,29 @@ const heroBlockStyle = {
     flexDirection: 'column',
     alignItems: 'center',
 };
+
+function resetSessionState() {
+    window.sessionStorage.removeItem(GAME_SESSION_STORAGE_KEY);
+}
+
+function playGame(gamemode) {
+    resetSessionState();
+    window.sessionStorage.removeItem(CUSTOM_GAME_SETTINGS_STORAGE_KEY);
+    router.push({
+        path: '/Game',
+        query: { gamemode },
+    });
+}
+
+function startCustomGame(settings) {
+    resetSessionState();
+    window.sessionStorage.setItem(CUSTOM_GAME_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    router.push({
+        path: '/Game',
+        query: { gamemode: CUSTOM_GAMEMODE_NAME },
+    });
+}
+
 onMounted(async () => {
     await nextTick();
 

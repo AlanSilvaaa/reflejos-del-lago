@@ -11,7 +11,7 @@
       </div>
       <div @click="handleCardClick(2)" class="inline-flex absolute cursor-pointer" style="transform-style: preserve-3d;"
         ref="infinite_mode">
-        <Polaroid :data="infiniteModeText" @playGame="PlayGame"/>
+        <Polaroid :data="customModeText" @playGame="PlayGame"/>
       </div>
     </div>
   </div>
@@ -19,15 +19,14 @@
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import gsap from "gsap";
 import Polaroid from "@/components/PolaroidPhoto.vue";
-import { normalModeText, noMovementModeText, infiniteModeText } from "@/data/polaroids";
+import { normalModeText, noMovementModeText, customModeText } from "@/data/polaroids";
 import flip_card from "../assets/sounds/card_flipped.wav";
 import { useSound } from "@vueuse/sound";
+import { CUSTOM_GAMEMODE_NAME } from "@/types/customGame";
 
-const router = useRouter();
-const GAME_SESSION_STORAGE_KEY = 'game-session';
+const emit = defineEmits(["playGame", "openCustomMode"]);
 const flipped = ref(false);
 const isFlipping = ref(false);
 const SPACING = 360;
@@ -57,10 +56,12 @@ const cardsStageStyle = {
 const { play: flipCard } = useSound(flip_card);
 
 function PlayGame(gamemode) {
-  window.sessionStorage.removeItem(GAME_SESSION_STORAGE_KEY);
-  router.push({
-    path: "/Game",
-    query: {gamemode: gamemode}});
+  if (gamemode === CUSTOM_GAMEMODE_NAME) {
+    emit("openCustomMode");
+    return;
+  }
+
+  emit("playGame", gamemode);
 }
 
 onMounted(async () => {
