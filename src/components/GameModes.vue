@@ -1,6 +1,6 @@
 <template>
   <div :style="gameModesStyle">
-    <div :style="cardsStageStyle">
+    <div :style="cardsStageStyle" :class="{ 'pointer-events-none': isFlipping }">
       <div @click="handleCardClick(0)" class="inline-flex absolute cursor-pointer" style="transform-style: preserve-3d;"
         ref="no_movement_mode">
         <Polaroid :data="noMovementModeText" @playGame="PlayGame"/>
@@ -29,6 +29,7 @@ import { useSound } from "@vueuse/sound";
 const router = useRouter();
 const GAME_SESSION_STORAGE_KEY = 'game-session';
 const flipped = ref(false);
+const isFlipping = ref(false);
 const SPACING = 360;
 const no_movement_mode = ref(null);
 const normal_mode = ref(null);
@@ -78,6 +79,10 @@ onBeforeUnmount(() => {
  * @param index - The index of the clicked card
  */
 function handleCardClick(index) {
+  if (isFlipping.value) {
+    return;
+  }
+
   handleFlipCard(index);
   moveCards(index);
 }
@@ -156,10 +161,11 @@ function moveCards(index) {
 function rotateCard() {
   const centerCard = items[currentCenterCard.value].value;
 
-  if (!centerCard) {
+  if (!centerCard || isFlipping.value) {
     return;
   }
 
+  isFlipping.value = true;
   flipCard();
   const target = flipped.value ? 0 : 180;
   gsap.to(centerCard, {
@@ -169,6 +175,10 @@ function rotateCard() {
     ease: "power1.inOut",
     onComplete() {
       flipped.value = !flipped.value;
+      isFlipping.value = false;
+    },
+    onInterrupt() {
+      isFlipping.value = false;
     }
   });
 }
