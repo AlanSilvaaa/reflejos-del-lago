@@ -10,6 +10,8 @@ Adds/Updates the difficulty of each node of the database. It reads each records,
 - NORMAL: > 1000 m and ≤ 5000 m
 - HARD: > 5000 m
 
+NOTE: These values can be outdated, so please check the `/src/config.ts` to see the current and real values.
+
 To run the script, use the following command:
 
 ```bash

@@ -7,7 +7,6 @@
       <img :src=front.img alt="Photo of normal mode"
         class="w-full h-64 object-cover mb-4" />
       <h1 class="text-black font-minecraft">{{ front.title }}</h1>
-      <small class="text-gray-600 text-sm">{{ front.highscore }}</small>
     </div>
 
     <!-- Back side -->
