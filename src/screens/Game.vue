@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useToast } from 'primevue/usetoast'
@@ -13,6 +14,10 @@ import {
   DEFAULT_CUSTOM_GAME_SETTINGS,
   normalizeCustomGameSettings,
 } from '@/types/customGame'
+
+defineOptions({
+  name: 'GameScreen',
+})
 
 const route = useRoute()
 const router = useRouter()

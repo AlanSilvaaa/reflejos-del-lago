@@ -40,3 +40,5 @@ export const customModeText = {
         rules: ["Rondas configurables", "Tiempo ajustable", "Filtra por comunas", "Elige dificultad y movimiento"],
     },
 }
+
+export const infiniteModeText = customModeText

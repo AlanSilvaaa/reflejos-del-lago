@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, ref } from 'vue'
 import { GoogleMap, Polygon } from 'vue3-google-map'
 import Tag from 'primevue/tag'
@@ -6,7 +6,7 @@ import { LLANQUIHUE_CENTER, LLANQUIHUE_MUNICIPALITIES } from '@/data/municipalit
 
 const props = defineProps({
   selectedMunicipalities: {
-    type: Array as () => string[],
+    type: Array,
     default: () => [],
   },
   initialZoom: {
@@ -19,16 +19,14 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits<{
-  toggleMunicipality: [name: string]
-}>()
+const emit = defineEmits(['toggleMunicipality'])
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const hoveredMunicipality = ref('')
 
 const selectedSet = computed(() => new Set(props.selectedMunicipalities))
 
-function blendHexColor(hex: string, targetHex: string, amount: number) {
+function blendHexColor(hex, targetHex, amount) {
   const normalizedHex = hex.replace('#', '')
   const normalizedTarget = targetHex.replace('#', '')
   const source = Number.parseInt(normalizedHex, 16)
@@ -70,7 +68,7 @@ const polygonGroups = computed(() => {
   })
 })
 
-function handleToggleMunicipality(name: string) {
+function handleToggleMunicipality(name) {
   if (!props.selectable) {
     return
   }

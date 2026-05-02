@@ -14,7 +14,7 @@ function getReleaseDate() {
 
 export default defineConfig(({ mode }) => ({
   plugins: [vue()],
-  base: mode === "production" ? "/Reflejos-del-lago/" : "/",
+  base: mode === "production" ? "/reflejos-del-lago/" : "/",
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __APP_RELEASE_DATE__: JSON.stringify(getReleaseDate()),

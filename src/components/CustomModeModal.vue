@@ -129,7 +129,7 @@
   </Dialog>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { computed, onMounted, ref } from 'vue'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
@@ -145,8 +145,6 @@ import {
   CUSTOM_DIFFICULTY_OPTIONS,
   DEFAULT_CUSTOM_GAME_SETTINGS,
   normalizeCustomGameSettings,
-  type CustomGameSettings,
-  type DifficultyLevel,
 } from '@/types/customGame'
 
 const props = defineProps({
@@ -156,28 +154,25 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits<{
-  'update:visible': [value: boolean]
-  start: [settings: CustomGameSettings]
-}>()
+const emit = defineEmits(['update:visible', 'start'])
 
 const municipalityOptions = ref(MUNICIPALITY_OPTIONS)
 const rounds = ref(DEFAULT_CUSTOM_GAME_SETTINGS.rounds)
-const selectedMunicipalities = ref<string[]>([])
+const selectedMunicipalities = ref([])
 const timePerRound = ref(DEFAULT_CUSTOM_GAME_SETTINGS.timePerRound)
 const disableMovement = ref(DEFAULT_CUSTOM_GAME_SETTINGS.disableMovement)
-const difficulty = ref<DifficultyLevel>(DEFAULT_CUSTOM_GAME_SETTINGS.difficulty)
+const difficulty = ref(DEFAULT_CUSTOM_GAME_SETTINGS.difficulty)
 
 const visibleModel = computed({
   get: () => props.visible,
-  set: (value: boolean) => emit('update:visible', value),
+  set: (value) => emit('update:visible', value),
 })
 
 const timePerRoundUnit = computed(() => (timePerRound.value < 60 ? 's' : 'min'))
 
 const timePerRoundDisplay = computed({
   get: () => (timePerRound.value < 60 ? timePerRound.value : timePerRound.value / 60),
-  set: (value: number | null) => {
+  set: (value) => {
     if (typeof value !== 'number' || Number.isNaN(value)) {
       return
     }
@@ -197,7 +192,7 @@ onMounted(async () => {
   }
 })
 
-function toggleMunicipality(name: string) {
+function toggleMunicipality(name) {
   selectedMunicipalities.value = selectedMunicipalities.value.includes(name)
     ? selectedMunicipalities.value.filter((entry) => entry !== name)
     : [...selectedMunicipalities.value, name]
