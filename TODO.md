@@ -8,3 +8,5 @@
 - [ ] 'Sin movimiento' does not work on custom game. Also change its description.
 - [ ] Update dockerfile.
 - [ ] Make releases and tag creations more automatic.
+- [ ] Fix Z-fighting when two markers are on the same place (can be replicated by having two markers really close to each other, and then un-zoom a lot)
+- [ ] When making another attemps after finishing one run, the map looks pixelated (doesn't load correctly)
